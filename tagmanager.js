@@ -28,7 +28,6 @@ $(function() {
             tagFieldName: 'tags[]',
             ajaxCreate: null,
             ajaxDelete: null,
-            values: [ ],
             initialCap: true,
             backspaceChars: [ 8 ],
             deleteOnBackspace: true,
@@ -286,12 +285,5 @@ $(function() {
                 $(this).trigger('create', [ $(this).val() ]);
             }
         });
-
-        // Pre-populate values
-        if ($(this).data('options').values) {
-            $(this).trigger('import',
-                [ $(this).data('options').values ]);
-        }
     }
-
 });
