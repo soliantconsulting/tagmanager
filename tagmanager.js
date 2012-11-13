@@ -33,19 +33,27 @@ $(function() {
             deleteOnBackspace: true,
             delimiterChars: [ 13, 44, 188 ],
             maxTags: 0,
-            createHandler: function(tag) {
+            maxTagsHandler: function(tagManager, tag, tagCount, maxTags) {
+                if (tagCount < maxTags) {
+                    $(this).attr('placeholder', 'Maximum of ' +
+                        $(this).data('options').maxTags + ' tags');
+                    return tag;
+                }
+                return false;
+            },
+            createHandler: function(tagManager, tag) {
                 return;
             },
-            deleteHandler: function(tag) {
+            deleteHandler: function(tagManager, tag) {
                 return;
             },
-            createElementHandler: function(tagElement) {
-                $($(tagElement).data('tagmanager')).before(tagElement);
+            createElementHandler: function(tagManager, tagElement) {
+                $(tagManager).before(tagElement);
             },
-            duplicateHandler: function(tag, existingTagElement) {
+            duplicateHandler: function(tagManager, tag, existingTagElement) {
                 return tag;
             },
-            validateHandler: function(tag) {
+            validateHandler: function(tagManager, tag) {
                 return tag;
             }
         };
@@ -90,7 +98,7 @@ $(function() {
         $(this).on('delete', function(e, tagHtml, skipAjax) {
 
             if ($(this).data('options').deleteHandler)
-                $(this).data('options').deleteHandler($(tagHtml).attr('tag'));
+                $(this).data('options').deleteHandler($(this), $(tagHtml).attr('tag'));
 
             if ($(this).data('options').strategy == 'ajax'
                 && $(this).data('options').ajaxDelete
@@ -125,11 +133,17 @@ $(function() {
 
             // Check max tags
             if ($(this).data('options').maxTags > 0
-                && $(this).data('tagIds').length >= $(this).data('options').maxTags) {
-                $(this).attr('originalPlaceholder', $(this).attr('placeholder'));
-                $(this).attr('placeholder', 'Maximum of ' + $(this).data('options').maxTags + ' tags');
-                $(this).val('');
-                return;
+                && $(this).data('tagIds').length >= $(this).data('options').maxTags - 1) {
+                tag = $(this).data('options').maxTagsHandler(
+                    $(this),
+                    tag,
+                    $(this).data('tagIds').length,
+                    $(this).data('options').maxTags
+                );
+                if (!tag) {
+                    $(this).val('');
+                    return;
+                }
             }
 
             // Caps first letter
@@ -138,7 +152,7 @@ $(function() {
             }
 
             // Validate Tag
-            tag = $(this).data('options').validateHandler(tag);
+            tag = $(this).data('options').validateHandler($(this), tag);
             if (!tag) {
                 $(this).val('');
                 return;
@@ -147,7 +161,7 @@ $(function() {
             // Check for duplicates and run handler
             var index = $.inArray(tag, $(this).data('tagStrings'));
             if (index != -1) {
-                tag = $(this).data('options').duplicateHandler(tag, $('#' + $(this).data('tagIds')[index]));
+                tag = $(this).data('options').duplicateHandler($(this), tag, $('#' + $(this).data('tagIds')[index]));
             }
             if (!tag) {
                 $(this).val('');
@@ -170,7 +184,7 @@ $(function() {
 
             // Run create handler
             if ($(this).data('options').createHandler)
-                $(this).data('options').createHandler(tag);
+                $(this).data('options').createHandler($(this), tag);
 
             // Build new tag
             var randomString = function(length) {
@@ -211,7 +225,7 @@ $(function() {
                 .appendTo(tagHtml);
 
             // Run create element handler
-            $(this).data('options').createElementHandler(tagHtml);
+            $(this).data('options').createElementHandler($(this), tagHtml);
 
             $(this).val('');
             $(this).focus();
