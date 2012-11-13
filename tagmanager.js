@@ -32,16 +32,16 @@ $(function() {
             backspaceChars: [ 8 ],
             deleteOnBackspace: true,
             delimiterChars: [ 13, 44, 188 ],
-            createHandler: function(tagManager, tag) {
+            createHandler: function(tagManager, tag, isImport) {
                 return;
             },
-            deleteHandler: function(tagManager, tag) {
+            deleteHandler: function(tagManager, tag, isEmpty) {
                 return;
             },
-            createElementHandler: function(tagManager, tagElement) {
+            createElementHandler: function(tagManager, tagElement, isImport) {
                 $(tagManager).before(tagElement);
             },
-            validateHandler: function(tagManager, tag) {
+            validateHandler: function(tagManager, tag, isImport) {
                 return tag;
             }
         };
@@ -83,14 +83,14 @@ $(function() {
         /**
          * Delete a tag
          */
-        $(this).on('delete', function(e, tagHtml, skipAjax) {
+        $(this).on('delete', function(e, tagHtml, isEmpty) {
 
             if ($(this).data('options').deleteHandler)
-                $(this).data('options').deleteHandler($(this), $(tagHtml).attr('tag'));
+                $(this).data('options').deleteHandler($(this), $(tagHtml).attr('tag'), isEmpty);
 
             if ($(this).data('options').strategy == 'ajax' &&
                 $(this).data('options').ajaxDelete &&
-                !skipAjax) {
+                !isEmpty) {
                 $.ajax({
                     url: $(this).data('options').ajaxDelete,
                     type: 'post',
@@ -111,7 +111,7 @@ $(function() {
         /**
          * Add a new tag
          */
-         $(this).on('create', function (e, rawTag, skipAjax)
+         $(this).on('create', function (e, rawTag, isImport)
          {
             var tag = $.trim(rawTag);
             if (!tag) {
@@ -125,7 +125,7 @@ $(function() {
             }
 
             // Validate Tag
-            tag = $(this).data('options').validateHandler($(this), tag);
+            tag = $(this).data('options').validateHandler($(this), tag, isImport);
             if (!tag) {
                 $(this).val('');
                 return;
@@ -134,7 +134,7 @@ $(function() {
             // Run ajax
             if ($(this).data('options').strategy == 'ajax' &&
                 $(this).data('options').ajaxCreate &&
-                !skipAjax) {
+                !isImport) {
                 $.ajax({
                     url: $(this).data('options').ajaxCreate,
                     type: 'post',
@@ -147,7 +147,7 @@ $(function() {
 
             // Run create handler
             if ($(this).data('options').createHandler)
-                $(this).data('options').createHandler($(this), tag);
+                $(this).data('options').createHandler($(this), tag, isImport);
 
             // Build new tag
             var randomString = function(length) {
@@ -188,7 +188,7 @@ $(function() {
                 .appendTo(tagHtml);
 
             // Run create element handler
-            $(this).data('options').createElementHandler($(this), tagHtml);
+            $(this).data('options').createElementHandler($(this), tagHtml, isImport);
 
             $(this).val('');
             $(this).focus();
