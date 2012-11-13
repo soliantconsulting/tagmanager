@@ -51,8 +51,8 @@ $(function() {
 
         $.extend(defaultOptions, options);
         $(this).data('options', defaultOptions);
-        $(this).data('tagIds', new Array());
-        $(this).data('tagStrings', new Array());
+        $(this).data('tagIds', [ ]);
+        $(this).data('tagStrings', [ ]);
 
         /**
          * Bind remove tag icon
@@ -91,9 +91,9 @@ $(function() {
             if ($(this).data('options').deleteHandler)
                 $(this).data('options').deleteHandler($(this), $(tagHtml).attr('tag'));
 
-            if ($(this).data('options').strategy == 'ajax'
-                && $(this).data('options').ajaxDelete
-                && !skipAjax) {
+            if ($(this).data('options').strategy == 'ajax' &&
+                $(this).data('options').ajaxDelete &&
+                !skipAjax) {
                 $.ajax({
                     url: $(this).data('options').ajaxDelete,
                     type: 'post',
@@ -114,9 +114,9 @@ $(function() {
         /**
          * Add a new tag
          */
-         $(this).on('create', function (e, tag, skipAjax)
+         $(this).on('create', function (e, rawTag, skipAjax)
          {
-            var tag = $.trim(tag);
+            var tag = $.trim(rawTag);
             if (!tag) {
                 $(this).val('');
                 return;
@@ -145,9 +145,9 @@ $(function() {
             }
 
             // Run ajax
-            if ($(this).data('options').strategy == 'ajax'
-                && $(this).data('options').ajaxCreate != null
-                && !skipAjax) {
+            if ($(this).data('options').strategy == 'ajax' &&
+                $(this).data('options').ajaxCreate &&
+                !skipAjax) {
                 $.ajax({
                     url: $(this).data('options').ajaxCreate,
                     type: 'post',
@@ -228,8 +228,8 @@ $(function() {
          * Prevent submit on enter
          */
         $(this).keypress(function(e) {
-            if (e.which == 13
-                && $.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
+            if (e.which == 13 &&
+                $.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
                 e.stopPropagation();
                 e.preventDefault();
             }
@@ -255,12 +255,11 @@ $(function() {
                 e.preventDefault();
 
                 // If the bootstrap typeahead is active use that value else use field value
-                if ($(this).data('typeahead')
-                    && $(this).data('typeahead').shown
-                    && $(this).data('typeahead').$menu.find('.active').length
+                if ($(this).data('typeahead') &&
+                    $(this).data('typeahead').shown &&
+                    $(this).data('typeahead').$menu.find('.active').length
                 ) {
                     return false;
-                    $(this).val($(this).data('typeahead').$menu.find('.active').attr('data-value'));
                 }
 
                 // For non enter keystrokes trim last character from value
@@ -270,5 +269,5 @@ $(function() {
                 $(this).trigger('create', [ $(this).val() ]);
             }
         });
-    }
+    };
 });
