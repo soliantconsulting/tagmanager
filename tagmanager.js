@@ -41,9 +41,6 @@ $(function() {
             createElementHandler: function(tagManager, tagElement) {
                 $(tagManager).before(tagElement);
             },
-            duplicateHandler: function(tagManager, tag, existingTagElement) {
-                return tag;
-            },
             validateHandler: function(tagManager, tag) {
                 return tag;
             }
@@ -129,16 +126,6 @@ $(function() {
 
             // Validate Tag
             tag = $(this).data('options').validateHandler($(this), tag);
-            if (!tag) {
-                $(this).val('');
-                return;
-            }
-
-            // Check for duplicates and run handler
-            var index = $.inArray(tag, $(this).data('tagStrings'));
-            if (index != -1) {
-                tag = $(this).data('options').duplicateHandler($(this), tag, $('#' + $(this).data('tagIds')[index]));
-            }
             if (!tag) {
                 $(this).val('');
                 return;
