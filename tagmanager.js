@@ -53,6 +53,8 @@ $(function() {
 
         $.extend(defaultOptions, options);
         $(this).data('options', defaultOptions);
+        $(this).data('tagIds', new Array());
+        $(this).data('tagStrings', new Array());
 
         /**
          * Bind remove tag icon
@@ -83,9 +85,8 @@ $(function() {
          */
         $(this).on('pop', function (e) {
             if ($(this).data('tagIds').length > 0) {
-                var id = $(this).data('tagIds')[$(this).data('tagIds').length - 1];
-
-                $(this).trigger('delete', [ $('#' + id) ]);
+                $(this).trigger('delete', [ $('#' +
+                    $(this).data('tagIds')[$(this).data('tagIds').length - 1]) ]);
             }
         });
 
@@ -98,7 +99,8 @@ $(function() {
                 $(this).data('options').deleteHandler($(tagHtml).attr('tag'));
 
             if ($(this).data('options').strategy == 'ajax'
-                && $(this).data('options').ajaxDelete) {
+                && $(this).data('options').ajaxDelete
+                && !skipAjax) {
                 $.ajax({
                     url: $(this).data('options').ajaxDelete,
                     type: 'post',
@@ -109,9 +111,9 @@ $(function() {
                 });
             }
 
-            var p = $.inArray($(tagHtml).attr('id'), $(this).data('tagIds'));
-            $(this).data('tagStrings').splice(p, 1);
-            $(this).data('tagIds').splice(p, 1);
+            var index = $.inArray($(tagHtml).attr('id'), $(this).data('tagIds'));
+            $(this).data('tagStrings').splice(index, 1);
+            $(this).data('tagIds').splice(index, 1);
 
             $(tagHtml).remove();
         });
@@ -159,8 +161,8 @@ $(function() {
             }
 
             // Run ajax
-            if ($(this).data('options').strategy == 'ajax' &&
-                $(this).data('options').ajaxCreate != null
+            if ($(this).data('options').strategy == 'ajax'
+                && $(this).data('options').ajaxCreate != null
                 && !skipAjax) {
                 $.ajax({
                     url: $(this).data('options').ajaxCreate,
@@ -185,12 +187,12 @@ $(function() {
             };
 
             var tagId = 'tag_' + randomString(32);
-            var newTagRemoveId = 'tag_remover_' + tagId;
+            var newTagRemoveId = 'tag_remove_' + tagId;
 
             $(this).data('tagStrings').push(tag);
             $(this).data('tagIds').push(tagId);
 
-            var tagHtml = $('<span></span>')
+            var tagHtml = $('<span />')
                 .addClass('tagmanagerTag')
                 .attr('tag', tag)
                 .attr('id', tagId)
@@ -199,7 +201,7 @@ $(function() {
 
             // Handle array strategy
             if ($(this).data('options').strategy == 'array') {
-                $('<input></input>')
+                $('<input>')
                     .attr('type', 'hidden')
                     .attr('name', $(this).data('options').tagFieldName)
                     .val(tag)
@@ -207,7 +209,7 @@ $(function() {
             }
 
             // Build remove link
-            var tagRemover = $('<a></a>')
+            var tagRemover = $('<a />')
                 .addClass('tagmanagerRemoveTag')
                 .attr('title', 'Remove')
                 .attr('href', '#')
@@ -244,7 +246,6 @@ $(function() {
         $(this).keypress(function(e) {
             if (e.which == 13
                 && $.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
-
                 e.stopPropagation();
                 e.preventDefault();
             }
@@ -255,7 +256,6 @@ $(function() {
          */
         $(this).keydown(function(e) {
             if ($.inArray(e.which, $(this).data('options').backspaceChars) != -1) {
-                // backspace or equivalent
                 if (!$(this).val()) {
                     e.preventDefault();
                     $(this).trigger('pop');
@@ -270,8 +270,7 @@ $(function() {
             if ($.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
                 e.preventDefault();
 
-                // If the typeahead is selected use that value else use field value
-
+                // If the bootstrap typeahead is active use that value else use field value
                 if ($(this).data('typeahead')
                     && $(this).data('typeahead').shown
                     && $(this).data('typeahead').$menu.find('.active').length
@@ -287,10 +286,6 @@ $(function() {
                 $(this).trigger('create', [ $(this).val() ]);
             }
         });
-
-        // Initialize the manager
-        $(this).data('tagIds', new Array());
-        $(this).data('tagStrings', new Array());
 
         // Pre-populate values
         if ($(this).data('options').values) {
