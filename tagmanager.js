@@ -32,15 +32,6 @@ $(function() {
             backspaceChars: [ 8 ],
             deleteOnBackspace: true,
             delimiterChars: [ 13, 44, 188 ],
-            maxTags: 0,
-            maxTagsHandler: function(tagManager, tag, tagCount, maxTags) {
-                if (tagCount < maxTags) {
-                    $(this).attr('placeholder', 'Maximum of ' +
-                        $(this).data('options').maxTags + ' tags');
-                    return tag;
-                }
-                return false;
-            },
             createHandler: function(tagManager, tag) {
                 return;
             },
@@ -129,21 +120,6 @@ $(function() {
             if (!tag) {
                 $(this).val('');
                 return;
-            }
-
-            // Check max tags
-            if ($(this).data('options').maxTags > 0
-                && $(this).data('tagIds').length >= $(this).data('options').maxTags - 1) {
-                tag = $(this).data('options').maxTagsHandler(
-                    $(this),
-                    tag,
-                    $(this).data('tagIds').length,
-                    $(this).data('options').maxTags
-                );
-                if (!tag) {
-                    $(this).val('');
-                    return;
-                }
             }
 
             // Caps first letter
