@@ -20,115 +20,87 @@
 
 $(function() {
 
-"use strict"; // jshint ;_;
+    "use strict"; // jshint ;_;
 
-$.fn.tagManager = function(options)
-{
-    var tagManagerOptions = {
-        prefilled: null,
-        capitalizeFirstLetter: false,
-        deleteTagsOnBackspace: true,
-        preventSubmitOnEnter: true,
-        typeahead: null,
-        delimeters: [44, 188, 13],
-        backspace: [8],
-        maxTags: 0,
-        tagValuesFieldName: "hidden_" + this.attr('name'),
-        tagCloseHtml: 'x',
+    $.fn.tagManager = function(options) {
+        var defaultOptions = {
+            strategy: 'array',
+            tagFieldName: 'tags[]',
+            ajaxCreate: null,
+            ajaxDelete: null,
+            values: [ ],
+            initialCap: true,
+            backspaceChars: [ 8 ],
+            deleteOnBackspace: true,
+            delimiterChars: [ 13, 44, 188 ],
+            maxTags: 0,
+            createHandler: function(tag) {
+                return;
+            },
+            deleteHandler: function(tag) {
+                return;
+            },
+            createElementHandler: function(tagElement) {
+                $($(tagElement).data('tagmanager')).before(tagElement);
+            },
+            duplicateHandler: function(tag) {
+                return tag;
+            },
+            validateHandler: function(tag) {
+                return tag;
+            }
+        };
 
-        insertTagHandler: null,
-        duplicateHandler: function(tag) {
+        $.extend(defaultOptions, options);
+        $(this).data('options', defaultOptions);
+
+        /**
+         * Bind remove tag icon
+         */
+        $('a.tagmanagerRemoveTag').live('click', function(e) {
+            $($(this).parent().data('tagmanager')).trigger('deleteTag',
+                [ $(this).parent() ]);
             return false;
-        },
-        validatorHandler: function(tag) {
-            return tag;
-        },
-
-        /**
-         * Used for strategy: 'ajax'
-         */
-        ajaxAdd: null,
-        ajaxDelete: null,
-
-        /**
-         * Strategy refers to how data is stored locally and posted when
-         * the form is submitted.
-         *
-         * csv: a hidden field will store all tags in a comma delimited list
-         *
-         * ajax: tags are added and removed over ajax with no local storage
-         *
-         * array: multiple hidden fields will each store one tag with a
-         *        common hidden_field_name[] If you use this strategy you _must_ change
-         *        your tagValuesFieldName to an array[] ending with [] e.g. tags[]
-         */
-        strategy: 'csv'
-    };
-
-    $.extend(tagManagerOptions, options);
-    $(this).data('tagManagerOptions', tagManagerOptions);
-
-    /**
-     * Refresh the selected values tag list hidden field
-     */
-    $(this).on('refreshTagList', function(e)
-    {
-        if ($(this).data('tagManagerOptions').strategy == 'csv')
-            $($(this).data("tagList")).val(
-                $(this).data('tagStrings').join(",")).change();
-    });
-
-
-    /**
-     * Bind remove tag icon
-     */
-    $('a.tagmanagerRemoveTag').live('click', function(e)
-    {
-        $($(this).parent().data('tagmanager')).trigger('deleteTag',
-            [ $(this).parent() ]);
-        return false;
-    });
-
-    /**
-     * Empty the tag manager
-     */
-    $(this).on('emptyTags', function(e)
-    {
-        $(this).data('tagStrings', new Array());
-        $(this).data('tagIds', new Array());
-
-        var field = this;
-
-        $('[id*="tag_"]').each(function(index, node) {
-            if ($(this).data('tagmanager') == field)
-                $(this).remove();
         });
 
-        $(this).trigger('refreshTagList');
-    });
+        /**
+         * Empty the tag manager
+         */
+        $(this).on('empty', function(e) {
+            $(this).data('tagStrings', new Array());
+            $(this).data('tagIds', new Array());
 
-    /**
-     * Delete the last tag
-     */
-    $(this).on('popTag', function (e)
-    {
-        if ($(this).data('tagIds').length > 0) {
-            var id = $(this).data('tagIds')[$(this).data('tagIds').length - 1];
+            var field = this;
 
-            $(this).trigger('deleteTag', [ $('#' + id) ]);
-        }
-    });
+            $('[id*="tag_"]').each(function(index, node) {
+                if ($(this).data('tagmanager') == field)
+                    $(this).remove();
+            });
+        });
 
-    /**
-     * Delete a tag
-     */
-    $(this).on('deleteTag', function(e, tagHtml)
-    {
-        var p = $.inArray($(tagHtml).attr('id'), $(this).data('tagIds'));
-        if (p != -1) {
-            if ($(this).data('tagManagerOptions').ajaxDelete != null) {
+        /**
+         * Delete the last tag
+         */
+        $(this).on('pop', function (e) {
+            if ($(this).data('tagIds').length > 0) {
+                var id = $(this).data('tagIds')[$(this).data('tagIds').length - 1];
+
+                $(this).trigger('delete', [ $('#' + id) ]);
+            }
+        });
+
+        /**
+         * Delete a tag
+         */
+        $(this).on('delete', function(e, tagHtml, skipAjax) {
+
+            if ($(this).data('options').deleteHandler)
+                $(this).data('options').deleteHandler($(tagHtml).attr('tag'));
+
+            if ($(this).data('options').strategy == 'ajax'
+                && $(this).data('options').ajaxDelete) {
                 $.ajax({
-                    url: $(this).data('tagManagerOptions').ajaxDelete,
+                    url: $(this).data('options').ajaxDelete,
                     type: 'post',
                     data: {
                         tag: $(tagHtml).attr('tag')
@@ -137,216 +109,181 @@ $.fn.tagManager = function(options)
                 });
             }
 
+            var p = $.inArray($(tagHtml).attr('id'), $(this).data('tagIds'));
             $(this).data('tagStrings').splice(p, 1);
             $(this).data('tagIds').splice(p, 1);
+
             $(tagHtml).remove();
-            $(this).trigger('refreshTagList');
-        }
-    });
+        });
 
-    /**
-     * Add a new tag
-     */
-     $(this).on('addTag', function (e, tag, skipAjax)
-     {
-        var tag = $.trim(tag);
-        if (!tag) return;
-
-        // Caps first letter
-        if ($(this).data('tagManagerOptions').capitalizeFirstLetter) {
-            tag = tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
-        }
-
-        // Validate Tag
-        if ($(this).data('tagManagerOptions').validatorHandler) {
-            tag = $(this).data('tagManagerOptions').validatorHandler(tag);
+        /**
+         * Add a new tag
+         */
+         $(this).on('create', function (e, tag, skipAjax)
+         {
+            var tag = $.trim(tag);
             if (!tag) return;
-        }
 
-        // Check max tags
-        if ($(this).data('tagManagerOptions').maxTags > 0
-            && $(this).data('tagStrings').length >= $(this).data('tagManagerOptions').maxTags) {
-            $(this).attr('originalPlaceholder', $(this).attr('placeholder'));
-            $(this).attr('placeholder', 'Maximum of ' + $(this).data('tagManagerOptions').maxTags + ' tags');
-            $(this).val('');
-            return;
-        }
+            // Check max tags
+            if ($(this).data('options').maxTags > 0
+                && $(this).data('tagIds').length >= $(this).data('options').maxTags) {
+                $(this).attr('originalPlaceholder', $(this).attr('placeholder'));
+                $(this).attr('placeholder', 'Maximum of ' + $(this).data('options').maxTags + ' tags');
+                $(this).val('');
+                return;
+            }
 
-        // Check for duplicates and run handler
-        if ($(this).data('tagManagerOptions').duplicateHandler)
-            var index = $.inArray(tag, $(this).data('tagStrings'));
-            if (index != -1) {
-                tag = $(this).data('tagManagerOptions').duplicateHandler(tag);
+            // Caps first letter
+            if ($(this).data('options').initialCap) {
+                tag = tag.charAt(0).toUpperCase() + tag.slice(1);
+            }
+
+            // Validate Tag
+            tag = $(this).data('options').validateHandler(tag);
             if (!tag) return;
-        }
 
-        // Run ajax
-        if ($(this).data('tagManagerOptions').ajaxAdd != null && !skipAjax) {
-            $.ajax({
-                url: $(this).data('tagManagerOptions').ajaxAdd,
-                type: 'post',
-                data: {
-                    tag: tag
-                },
-                dataType: 'json'
-            });
-        }
+            // Check for duplicates and run handler
+            if ($.inArray(tag, $(this).data('tagStrings')) != -1)
+                tag = $(this).data('options').duplicateHandler(tag);
+            if (!tag) return;
 
-        // Build new tag
-        var randomString = function(length) {
-            var result = '';
-            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-            return result;
-        };
+            // Run ajax
+            if ($(this).data('options').strategy == 'ajax' &&
+                $(this).data('options').ajaxCreate != null
+                && !skipAjax) {
+                $.ajax({
+                    url: $(this).data('options').ajaxCreate,
+                    type: 'post',
+                    data: {
+                        tag: tag
+                    },
+                    dataType: 'json'
+                });
+            }
 
-        var tagId = 'tag_' + randomString(32);
-        var newTagRemoveId = 'tag_remover_' + tagId;
+            // Run create handler
+            if ($(this).data('options').createHandler)
+                $(this).data('options').createHandler(tag);
 
-        $(this).data('tagStrings').push(tag);
-        $(this).data('tagIds').push(tagId);
+            // Build new tag
+            var randomString = function(length) {
+                var result = '';
+                var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+                return result;
+            };
 
-        var tagHtml = $('<span></span>')
-            .addClass('tagmanagerTag')
-            .attr('tag', tag)
-            .attr('id', tagId)
-            .data('tagmanager', this)
-            .text(tag);
+            var tagId = 'tag_' + randomString(32);
+            var newTagRemoveId = 'tag_remover_' + tagId;
 
-        // Handle array strategy
-        if ($(this).data('tagManagerOptions').strategy == 'array') {
-            $('<input></input>')
-                .attr('type', 'hidden')
-                .attr('name', $(this).data('tagManagerOptions').tagValuesFieldName)
-                .val(tag)
+            $(this).data('tagStrings').push(tag);
+            $(this).data('tagIds').push(tagId);
+
+            var tagHtml = $('<span></span>')
+                .addClass('tagmanagerTag')
+                .attr('tag', tag)
+                .attr('id', tagId)
+                .data('tagmanager', this)
+                .text(tag);
+
+            // Handle array strategy
+            if ($(this).data('options').strategy == 'array') {
+                $('<input></input>')
+                    .attr('type', 'hidden')
+                    .attr('name', $(this).data('options').tagFieldName)
+                    .val(tag)
+                    .appendTo(tagHtml);
+            }
+
+            // Build remove link
+            var tagRemover = $('<a></a>')
+                .addClass('tagmanagerRemoveTag')
+                .attr('title', 'Remove')
+                .attr('href', '#')
+                .text('x')
                 .appendTo(tagHtml);
-        }
 
-        // Build remove link
-        var tagRemover = $('<a></a>')
-            .addClass('tagmanagerRemoveTag')
-            .attr('title', 'Remove')
-            .attr('href', '#')
-            .html($(this).data('tagManagerOptions').tagCloseHtml)
-            .appendTo(tagHtml);
+            // Run create element handler
+            $(this).data('options').createElementHandler(tagHtml);
 
-        // Run custom insert tag handler
-        if($(this).data('tagManagerOptions').insertTagHandler != null) {
-            $(this).data('tagManagerOptions').insertTagHandler(tagHtml);
-        }else {
-            $(this).before(tagHtml);
-        }
+            $(this).val('');
+            $(this).focus();
+        });
 
-        $(this).trigger('refreshTagList');
+        /**
+         * Import prefilled tags without triggering ajaxCreate
+         */
+        $(this).on('import', function (e, tags) {
+            var field = this;
 
-        $(this).data('typeahead').hide();
-        $(this).val('');
-        $(this).focus();
-    });
+            if (typeof (tags) == "object") {
+                $.each(tags, function (key, val) {
+                    $(field).trigger('create', [ val, true ]);
+                });
+            } else if (typeof (tags) == "string") {
+                $.each(tags.split(','), function (key, val) {
+                    $(field).trigger('create', [ val, true ]);
+                });
+            }
+        });
 
-    /**
-     * Import prefilled tags without triggering ajaxAdd
-     */
-    $(this).on('importTags', function (e, tags)
-    {
-        var field = this;
+        /**
+         * Prevent submit on enter
+         */
+        $(this).keypress(function(e) {
+            if (e.which == 13
+                && $.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
 
-        if (typeof (tags) == "object") {
-            $.each(tags, function (key, val) {
-                $(field).trigger('addTag', [ val, true ]);
-            });
-        } else if (typeof (tags) == "string") {
-            $.each(tags.split(','), function (key, val) {
-                $(field).trigger('addTag', [ val, true ]);
-            });
-        }
-    });
-
-    /**
-     * Prevent submit on enter
-     */
-    $(this).keypress(function(e)
-    {
-        if ($(this).data('tagManagerOptions').preventSubmitOnEnter) {
-            if (e.which == 13) {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        }
-    });
+        });
 
-    /**
-     * If backspace then delete latest tag
-     */
-    $(this).keydown(function(e)
-    {
-        if(!$(this).data('tagManagerOptions').deleteTagsOnBackspace) return;
+        /**
+         * If backspace then delete latest tag
+         */
+        $(this).keydown(function(e) {
+            if ($.inArray(e.which, $(this).data('options').backspaceChars) != -1) {
+                // backspace or equivalent
+                if (!$(this).val()) {
+                    e.preventDefault();
+                    $(this).trigger('pop');
+                }
+            }
+        });
 
-        if ($.inArray(e.which, $(this).data('tagManagerOptions').backspace) != -1) {
-            // backspace or equivalent
-            if (!$(this).val()) {
+        /**
+         * If a delimiting key is pressed, add the current value
+         */
+        $(this).keyup(function (e) {
+            if ($.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
                 e.preventDefault();
-                $(this).trigger('popTag');
+
+                // If the typeahead is selected use that value else use field value
+                if ($(this).data('typeahead')
+                    && $(this).data('typeahead').shown
+                    && $(this).data('typeahead').$menu.find('.active').length
+                ) {
+                    $(this).val($(this).data('typeahead').$menu.find('.active').attr('data-value'));
+                }
+
+                // For non enter keystrokes trim last character from value
+                if (e.which != 13)
+                    $(this).val($(this).val().substr(0, $(this).val().length -1));
+
+                $(this).trigger('create', [ $(this).val() ]);
             }
+        });
+
+        // Initialize the manager
+        $(this).data('tagIds', new Array());
+        $(this).data('tagStrings', new Array());
+
+        // Pre-populate values
+        if ($(this).data('options').values) {
+            $(this).trigger('import',
+                [ $(this).data('options').values ]);
         }
-    });
-
-    /**
-     * If a delimiting key is pressed, add the current value
-     */
-    $(this).keyup(function (e)
-    {
-        if ($.inArray(e.which, $(this).data('tagManagerOptions').delimeters) != -1) {
-            e.preventDefault();
-
-            // If the typeahead is selected use that value else use field value
-            if ($(this).data('typeahead').shown
-                && $(this).data('typeahead').$menu.find('.active').length
-            ) {
-                $(this).val($(this).data('typeahead').$menu.find('.active').attr('data-value'));
-            }
-
-            // For non enter keystrokes trim last character from value
-            if (e.which != 13)
-                $(this).val($(this).val().substr(0, $(this).val().length -1));
-
-            $(this).trigger('addTag', [ $(this).val() ]);
-        }
-    });
-
-    // Initialize the manager
-    $(this).data('tagStrings', new Array());
-    $(this).data('tagIds', new Array());
-
-    switch ($(this).data('tagManagerOptions').strategy) {
-        case 'array':
-            break;
-
-        case 'ajax':
-            break;
-
-        case 'csv':
-        default:
-            var hiddenTagsField = $('<input></input')
-                .attr('name', $(this).data('tagManagerOptions').tagValuesFieldName)
-                .attr('type', 'hidden')
-                .val('');
-
-            $(this).after(hiddenTagsField);
-            $(this).data("tagList", hiddenTagsField);
-            break;
     }
-
-    // Init bootstrap typeahead
-    if ($(this).data('tagManagerOptions').typeahead) {
-        $(this).typeahead($(this).data('tagManagerOptions').typeahead);
-    }
-
-    // Pre-populate values
-    if ($(this).data('tagManagerOptions').prefilled) {
-        $(this).trigger('importTags',
-            [ $(this).data('tagManagerOptions').prefilled ]);
-    }
-}
 
 });
