@@ -3,7 +3,7 @@ Tag Manager
 
 Introduction
 ------------
-An extensible jQuery plugin
+A tag manager written in jQuery and extensible by Bootstrap
 
 Development
 ------------------
