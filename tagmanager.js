@@ -68,14 +68,9 @@ $(function() {
          * Empty the tag manager
          */
         $(this).on('empty', function(e) {
-            $(this).data('tagStrings', new Array());
-            $(this).data('tagIds', new Array());
-
-            var field = this;
-
-            $('[id*="tag_"]').each(function(index, node) {
-                if ($(this).data('tagmanager') == field)
-                    $(this).remove();
+            var tagmanager = this;
+            $($(this).data('tagIds')).each(function(index, value) {
+                $(tagmanager).trigger('delete', [ $('#' + value), true ]);
             });
         });
 
