@@ -39,7 +39,6 @@ $(function() {
             ajaxDelete: null,
             initialCap: true,
             backspaceChars: [ 8 ],
-            deleteOnBackspace: true,
             delimiterChars: [ 13, 44, 188 ],
             createHandler: function(tagManager, tag, isImport) {
                 return;
