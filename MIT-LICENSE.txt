@@ -1,16 +1,3 @@
-Tag Manager
-===========
-
-Introduction
-------------
-An extensible jQuery tag manager 
-
-Development
-------------------
-The home page for this project is http://tagmanager-tomanderson.rhcloud.com
-
-License
--------
 Copyright 2012 Soliant Consulting
 http://www.soliantconsulting.com
 
