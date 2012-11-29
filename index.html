@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>Tag Manager</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Le styles -->
+        <link href="css/style.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="js/tagmanager/tagmanager.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="bootstrap/docs/assets/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="bootstrap/docs/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="http://db.etree.org/images/ico/tag_green.png" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        <!-- Scripts -->
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+        <!--[if lt IE 9]> <script type="text/javascript" src="/js/html5.js"></script><![endif]-->
+        <script type="text/javascript" src="js/tagmanager/tagmanager.js"></script>
+        <script type="text/javascript" src="bootstrap/docs/assets/js/bootstrap.js"></script>
+
+        <style>
+            h1 {
+                padding-bottom: 0.5em;
+            }
+
+            div.specification {
+                border: solid;
+                border-color: #333333;
+                border-radius: 6px;
+                padding: 5px;
+                margin-bottom: 2em;
+            }
+
+            div.specification table thead {
+                background-color: #CDE69C;
+                color: #638421;
+                border: 1px solid #A5D24A;
+            }
+
+            div.specification table td, div.specification table th {
+                font-weight: normal;
+                padding: 5px;
+                vertical-align: top;
+            }
+
+            div.specification table caption {
+                text-align: left;
+                padding-bottom: 1em;
+            }
+
+            .submenu > li {
+                min-width: 8em;
+            }
+
+            .submenu > li > a {
+                padding-bottom: 5px;
+            }
+
+            .nav-list > .active > a, .nav-list > .active > a:hover {
+                background-color: #CDE69C;
+                border: 1px solid #A5D24A;
+                border-radius: 3px 3px 3px 3px;
+                line-height: 18px;
+                height: 18px;
+                color: #638421;
+                text-shadow: none;
+            }
+
+            .submenux {
+                color: silver;
+                float: right;
+                margin-top: 3px;
+                display: none;
+            }
+
+            .nav-list > .active > .submenux {
+                display: block;
+            }
+
+        </style>
+
+        <script>
+        $(function() {
+
+            $('a.source').live('click', function(event) {
+                $('#' + $(this).attr('target')).toggle();
+                return false;
+            });
+
+            $('div.specification tbody tr').live({
+                mouseenter: function(event) {
+                    if (!$(this).data('background-color')) $(this).data('background-color', $(this).css('background-color'));
+                    $(this).css('background-color', '#cccccc');
+                },
+                mouseleave: function(event) {
+                    $(this).css('background-color', $(this).data('background-color'));
+                }
+            });
+
+            $('div.specification table').each(function(index, node) {
+                var iterator = false;
+                $(this).find('tbody tr').each(function(index, node) {
+                    if (iterator) $(this).css('background-color', '#F5F5F5')
+                    else $(this).css('background-color', 'white');
+                    iterator = !iterator;
+                });
+            });
+        });
+        </script>
+    </head>
+
+    <body data-spy="scroll" data-target="#submenu">
+        <a data-spy="affix" class="affix" style="top: 1; right: 0; border: 0;" href="https://github.com/TomHAnderson/tagmanager"><img src="index_files/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="index.html">Tag Manager</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav">
+                            <li class="active"><a href="index.html">Home</a></li>
+                            <li><a href="https://github.com/TomHAnderson/tagmanager">Source</a></li>
+                            <li><a href="http://opensource.org/licenses/MIT">License</a></li>
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="span2" id="submenu">
+                    <ul data-spy="affix" class="nav nav-list submenu affix">
+                        <li class="active">
+                            <span class="submenux">x</span>
+                            <a href="#introduction">Introduction</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#examples">Examples</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#code">Code</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#strategy">Strategy</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#options">Options</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#handlers">Handlers</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#firingOrder">Firing Order</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#events">Events</a>
+                        </li>
+                        <li>
+                            <span class="submenux">x</span>
+                            <a href="#data">Data</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="span10">
+                    <section id="introduction">
+                        <h2>Introduction</h2>
+                        <div class="specification">
+                            This is an extensible tag manager written in jQuery.  Support is specifically built in for Bootstrap typeahead.
+                            <br>
+                            <br>
+                            A product of <a href="http://www.soliantconsulting.com/">Soliant Consulting</a>.  Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License</a>
+                        </div>
+                    </section>
+                    <section id="examples">
+                        <h2>Examples</h2>
+                        <div class="specification">
+
+                            <h3>Default</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example1').tagManager();
+                                    });
+                                </script>
+                                <input name="tags1" placeholder="Add Tags" id="example1" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags1_source">view source</a>
+                                <div id="tags1_source" style="display: none;">
+                                    <pre>$('#example1').tagManager();</pre>
+                                </div>
+                            </form>
+
+                            <h3>Bulk Tag Handling Events</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example2').tagManager();
+                                        $('#example2').trigger('import',
+                                            [ [ 'Tag A', 'Tag B' ] ]);
+                                    });
+                                </script>
+                                <span id="tag_0aT5d5IBx5vvSNctNtLdLrXrA33jHA3i" tag="Tag A" class="tagmanagerTag">Tag A<input value="Tag A" name="tags[]" type="hidden"><a href="#" title="Remove" class="tagmanagerRemoveTag">x</a></span><span id="tag_6Ejv0LRfqjBjUO6qgPGkDYg88I1bP3GM" tag="Tag B" class="tagmanagerTag">Tag B<input value="Tag B" name="tags[]" type="hidden"><a href="#" title="Remove" class="tagmanagerRemoveTag">x</a></span><input name="tags2" placeholder="Add Tags" id="example2" autocomplete="off" type="text">
+                                <button onclick="$('#example2').trigger('import', [ [ 'Tag A', 'Tag B' ] ]); return false;">Import</button>
+                                <button onclick="$('#example2').trigger('empty'); return false;">Empty</button>
+                                <a href="#" class="source" target="tags2_source">view source</a>
+                                <div id="tags2_source" style="display: none;">
+<pre>&lt;button onClick="
+    $('#example2').trigger('import', [ [ 'Tag A', 'Tag B' ] ]);
+    return false;
+"&gt;Import&lt;/button&gt;
+
+&lt;button onClick="
+    $('#example2').trigger('empty');
+    return false;
+"&gt;Empty&lt;/button&gt;
+</pre>
+                                </div>
+                            </form>
+                            <br>
+                            These events are used to initially populate the tag manager and reset it.
+
+                            <h3>Validate Handler</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example6').tagManager({
+                                            validateHandler: function(tagManager, tag, isImport) {
+                                                if (isImport) return tag;
+
+                                                if (tag == 'Invalid') {
+                                                    alert('You entered an invalid tag');
+                                                    return false;
+                                                } else {
+                                                    alert('Adding ' + tag);
+                                                    return tag;
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <input name="tags6" placeholder="Add Tags" id="example6" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags6_source">view source</a>
+                                <div id="tags6_source" style="display: none;">
+<pre>$('#example6').tagManager({
+    validateHandler: function(tagManager, tag, isImport) {
+        if (isImport) return tag;
+
+        if (tag == 'Invalid') {
+            alert('You entered an invalid tag');
+            return false;
+        } else {
+            alert('Adding ' + tag);
+            return tag;
+        }
+    }
+});
+</pre>
+                                </div>
+                            </form>
+                            <br>
+                            Type 'invalid' to trigger an invalid tag.
+
+                            <h3>Validate Handler for Duplicates</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example4').tagManager({
+                                            validateHandler: function(tagManager, tag, isImport) {
+                                                if (isImport) return tag;
+
+                                                var index = $.inArray(tag, $(tagManager).data('tagStrings'));
+                                                if (index != -1) {
+                                                    $('#' + $(tagManager).data('tagIds')[index]).effect(
+                                                        "highlight", {}, 3000);
+                                                    return false;
+                                                }
+                                                return tag;
+                                             }
+                                        });
+                                    });
+                                </script>
+                                <input name="tags4" placeholder="Add Tags" id="example4" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags4_source">view source</a>
+                                <div id="tags4_source" style="display: none;">
+<pre>$('#example4').tagManager({
+    validateHandler: function(tagManager, tag, isImport) {
+        if (isImport) return tag;
+
+        var index = $.inArray(tag, $(tagManager).data('tagStrings'));
+        if (index != -1) {
+            $('#' + $(tagManager).data('tagIds')[index]).effect(
+                "highlight", {}, 3000);
+            return false;
+        }
+        return tag;
+     }
+});
+</pre>
+                                </div>
+                            </form>
+                            <br>
+                            Duplicates are not allowed and the existing value is hilighted.
+
+                            <h3>Validate and Delete Handlers for Max Tags</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example7').tagManager({
+                                            validateHandler: function(tagManager, tag, isImport) {
+                                                if (isImport) return tag;
+
+                                                var maxTags = 3;
+                                                var tagCount = $(tagManager).data('tagIds').length;
+
+                                                if (tagCount == maxTags - 1) {
+                                                    $(tagManager).attr('placeholder', 'Maximum of ' +
+                                                        maxTags + ' tags');
+                                                }
+
+                                                if (tagCount == maxTags) {
+                                                    return false;
+                                                }
+
+                                                return tag;
+                                            },
+
+                                            deleteHandler: function(tagManager, tag, isEmpty) {
+                                                $(tagManager).attr('placeholder', 'Add Tags');
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <input name="tags7" placeholder="Add Tags" id="example7" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags7_source">view source</a>
+                                <div id="tags7_source" style="display: none;">
+<pre>$('#example7').tagManager({
+    validateHandler: function(tagManager, tag, isImport) {
+        if (isImport) return tag;
+
+        var maxTags = 3;
+        var tagCount = $(tagManager).data('tagIds').length;
+
+        if (tagCount == maxTags - 1) {
+            $(tagManager).attr('placeholder', 'Maximum of ' +
+                maxTags + ' tags');
+        }
+
+        if (tagCount == maxTags) {
+            return false;
+        }
+
+        return tag;
+    },
+
+    deleteHandler: function(tagManager, tag, isEmpty) {
+        $(tagManager).attr('placeholder', 'Add Tags');
+    }
+});
+</pre>
+                                </div>
+                            </form>
+
+                            <h3>Create Element Handler</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example5').tagManager({
+                                            createElementHandler: function(tagManager, tagElement, isImport) {
+                                                $(tagElement).css('float', 'none');
+                                                $(tagElement).appendTo('#createElementHandlerBox');
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <input name="tags5" placeholder="Add Tags" id="example5" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags5_source">view source</a><br>
+                                <div id="tags5_source" style="display: none;">
+<pre>$('#example5').tagManager({
+    createElementHandler: function(tagManager, tagElement, isImport) {
+        $(tagElement).css('float', 'none');
+        $(tagElement).appendTo('#createElementHandlerBox');
+    }
+});
+</pre>
+                                </div>
+                                Tags are modified and created in the DOM with <a href="#handlers">createElementHandler</a>.
+                                <br>
+                                <div style="border: solid; border-color: #999999; border-radius: 6px; min-height: 1em;" id="createElementHandlerBox"></div>
+                            </form>
+
+                            <h3>Bootstrap Typeahead</h3>
+                            <form style="display: inline;">
+                                <script>
+                                    $(function() {
+                                        $('#example3').tagManager({
+                                            delimiterChars: [ 13, 44, 188 ],
+                                        });
+
+                                        $('#example3').typeahead({
+                                            source: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'],
+                                            suppressKeyPressRepeat: true,
+                                            updater: function(tag) {
+                                                this.$element.trigger('create', [ tag ]);
+                                                this.hide();
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <input name="tags3" placeholder="Add Tags" id="example3" autocomplete="off" type="text">
+                                <a href="#" class="source" target="tags3_source">view source</a>
+                                <div id="tags3_source" style="display: none;">
+<pre>$('#example3').tagManager({
+    delimiterChars: [ 13, 44, 188 ],
+});
+
+$('#example3').typeahead({
+    source: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'],
+    suppressKeyPressRepeat: true,
+    updater: function(tag) {
+        this.$element.trigger('create', [ tag ]);
+        this.hide();
+    }
+});
+</pre>
+                                </div>
+                            </form>
+                            <br>
+                            There are two known issues with Bootstrap:
+                            <ol>
+                                <li>Arrow navigation sometimes fires twice (see <a href="https://github.com/twitter/bootstrap/pull/5862">#5862</a>)</li>
+                                <li>Typeahead requires a selected value</li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <section id="code">
+                        <h2>Code</h2>
+                        <div class="specification">
+                        <h3>HTML</h3>
+<pre>&lt;input type="text" name="tags1" placeholder="Add Tags"
+    id="tagmanager" autocomplete="off"&gt;
+</pre>
+
+                        <h3>Javascript</h3>
+                        <pre>$('#tagmanager').tagManager();</pre>
+
+                        <h3>Configuration</h3>
+<pre>$('#tagmanager').tagManager({
+    strategy: 'array',
+    tagFieldName: 'tags[]',
+    ajaxCreate: 'http://localhost/tag/create',
+    ajaxDelete: 'http://localhost/tag/delete',
+    initialCap: true,
+    backspaceChars: [ 8 ],
+    delimiterChars: [ 13, 44, 188 ],
+    createHandler: function(tagManager, tag, isImport) {
+        return;
+    },
+    deleteHandler: function(tagManager, tag, isEmpty) {
+        return;
+    },
+    createElementHandler: function(tagManager, tagElement, isImport) {
+        $(tagManager).before(tagElement);
+    },
+    validateHandler: function(tagManager, tag, isImport) {
+        return tag;
+    }
+});
+</pre>
+                        </div>
+                    </section>
+
+                    <section id="strategy">
+                        <h2>Strategy</h2>
+                        <div class="specification">
+                            <table>
+                                <caption>
+                                    <pre>$('#tagmanager').data('config').optionName;</pre>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Option Name</th>
+                                        <th>Datatype</th>
+                                        <th>Default</th>
+                                        <th>Description</th>
+                                    </tr>
+
+                                </thead><tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>strategy</td>
+                                        <td>string</td>
+                                        <td>array</td>
+                                        <td>The array strategy is default and
+            creates a new input field for each tag created with the tag manager.
+            The field name is defined with option tagFieldName and must be an array
+            such as "tags[]".  The second strategy is ajax which requires ajaxCreate
+             and ajaxDelete options with URLs to post a tag to when created or
+            deleted.  The third strategy is none which requires the programmer to
+            use <a href="#handlers">handlers</a> to persist tags.
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>tagFieldName</td>
+                                        <td>string</td>
+                                        <td>tags[]</td>
+                                        <td>When using the array strategy this
+            option is required.  This is the input field name for each tag to be
+            sent back to your server as part of a form submission.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>ajaxCreate</td>
+                                        <td>string</td>
+                                        <td>null</td>
+                                        <td>A URL to post an ajax request to when a tag is created.  e.g. http://localhost/tag/create?id=5
+                                        The <a href="#handlers">createHandler</a> can be used for more fine-grained ajax handling.
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>ajaxDelete</td>
+                                        <td>string</td>
+                                        <td>null</td>
+                                        <td>A URL to post an ajax request to when a tag is deleted.  e.g. http://localhost/tag/delete?id=5
+                                        The <a href="#handlers">deleteHandler</a> can be used for more fine-grained ajax handling.
+                                        </td>
+                                    </tr>
+
+                            </tbody></table>
+                        </div>
+                    </section>
+
+                    <section id="options">
+                        <h2>Options</h2>
+                        <div class="specification">
+                            <table>
+                                <caption>
+                                    <pre>$('#tagmanager').data('config').optionName;</pre>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Option Name</th>
+                                        <th>Datatype</th>
+                                        <th>Default</th>
+                                        <th>Description</th>
+                                    </tr>
+
+                                </thead><tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>initialCap</td>
+                                        <td>boolean</td>
+                                        <td>true</td>
+                                        <td>Proper case the first word of each tag?</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>backspaceChars</td>
+                                        <td>array</td>
+                                        <td>[ 8 ]</td>
+                                        <td>An array of character key codes to
+            accept as "backspace" when the field is empty.  When the input field is
+            empty and a backspace character is entered the last tag will be deleted.
+              Pass an empty array the config to disable this feature.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>delimiterChars</td>
+                                        <td>array</td>
+                                        <td>[ 13, 44, 188 ]</td>
+                                        <td>An array of character key codes to
+            delimit a tag.  If char code 13, Enter Key, is in the list the default
+            form submission mechanism is overridden to allow the enter key to act as
+             a delimiter.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="handlers">
+                        <h2>Handlers</h2>
+                        <div class="specification">
+                            <table>
+                                <caption>
+                                    <pre>$('#tagmanager').data('config').handlerName;</pre>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Handler Name</th>
+                                        <th>Parameters</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>createHandler</td>
+                                        <td>tagManager, tag, isImport</td>
+                                        <td>Fired when a new tag is created with the
+             tag manager.  Fired before createElementHandler.  No return value.
+            isImport will be true if fired from the import event.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>deleteHandler</td>
+                                        <td>tagManager, tag, isEmpty</td>
+                                        <td>Fired when a tag is deleted from the tag manager.  No return value.  isEmpty will be true if fired from the empty event.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>createElementHandler</td>
+                                        <td>tagManager, jQuery element, isImport</td>
+                                        <td>When a tag is created in the manager
+            this function will pass the genereated jQuery element as a parameter so
+            it can be processed and placed anywhere on the page.  isImport will be
+            true if fired from the import event.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>validateHandler</td>
+                                        <td>tagManager, tag, isImport</td>
+                                        <td>If the validator handler returns false
+            the tag will not be created.  If the validator handler returns any other
+             value that value will be created instead of the original value.
+            isImport will be true if fired from the import event.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="firingOrder">
+                        <h2>Firing Order</h2>
+                        <div class="specification">
+                            <table width="100%">
+                                <caption>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Handler</th>
+                                        <th>Can Cancel Event</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>create</td>
+                                        <td><a href="#handlers">validateHandler</a></td>
+                                        <td>yes</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>create</td>
+                                        <td><a href="#handlers">createHandler</a></td>
+                                        <td>no</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>create</td>
+                                        <td><a href="#handlers">createElementHandler</a></td>
+                                        <td>no</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>delete</td>
+                                        <td><a href="#handlers">deleteHandler</a></td>
+                                        <td>no</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="events">
+                        <h2>Events</h2>
+                        <div class="specification">
+                            <table>
+                                <caption>
+                                    <pre>$('#tagmanager').trigger(eventName, [ parameter1, parameter2 ]);</pre>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Parameters</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>create</td>
+                                        <td>tag, isImport</td>
+                                        <td>Adds a tag to the tag manager.  The
+            first parameter is the tag string.  The second parameter defaults to
+            false and will not fire <a href="#strategy">ajaxCreate</a> if true.
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>delete</td>
+                                        <td>tagElement, isEmpty</td>
+                                        <td>Removes a tag from the tag manager.  The
+             first parameter is the jQuery handle of the tag span created from the
+            tag manager.  The second parameter defaults to false and will not fire <a href="#strategy">ajaxDelete</a> if true.
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>import</td>
+                                        <td>tags</td>
+                                        <td>Import an array of tags without firing <a href="#strategy">ajaxCreate</a>.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>empty</td>
+                                        <td><i>none</i></td>
+                                        <td>Clears all tags from the tag manager without firing <a href="#strategy">ajaxDelete</a>.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>pop</td>
+                                        <td><i>none</i></td>
+                                        <td>Pop the last tag.  Used when backspace is fired.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="data">
+                        <h2>Data</h2>
+                        <div class="specification">
+                            <table width="100%">
+                                <caption>
+                                    <pre>$('#tagmanager').data(fieldName);</pre>
+                                </caption>
+
+                                <thead>
+                                    <tr>
+                                        <th>Field Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>config</td>
+                                        <td>An object with the complete tag manager configuration.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(245, 245, 245);">
+                                        <td>tagIds</td>
+                                        <td>An array of span ids of all tags in the tag manager.</td>
+                                    </tr>
+                                    <tr style="background-color: rgb(255, 255, 255);">
+                                        <td>tagStrings</td>
+                                        <td>An array of tag strings of all tags in
+            the tag manager.  This array is paired with tagIds.  A paired array
+            approach is a simpler implementation than a hash.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <hr>
+            <footer>
+                <p>© 2012 <a href="http://www.soliantconsulting.com/">Soliant Consulting</a> All rights reserved. <a href="http://opensource.org/licenses/MIT">See License</a></p>
+            </footer>
+        </div> <!-- /container -->
+    </body>
+</html>
