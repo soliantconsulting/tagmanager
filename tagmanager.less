@@ -1,47 +1,45 @@
 // Tag Manager
 // © 2012 Soliant Consulting
 
-@silver: silver;
 @gray: #638421;
 @green: #a5d24a;
+@silver: silver;
 
-@font-size: 13px;
-@radius: 3px;
-@border: 1px;
-@margin: 5px;
-@padding: 5px;
-@height: 18px;
+@tag-font-size: 13px;
+@tag-radius: 3px;
+@tag-border: 1px;
+@tag-margin: 5px;
+@tag-padding: 5px;
+@tag-height: 18px;
 
-@remove-link-padding: 8px;
+@remove-padding: 8px;
 
-.tagManager
-{
-    border-radius: @radius @radius @radius @radius;
-    margin-top:0;
-}
 
+// A tag
 .tagmanagerTag
 {
     background: none repeat scroll 0 0 @green;
-    border: @border solid @green;
-    border-radius: @radius;
+    border: @tag-border solid @green;
+    border-radius: @tag-radius;
     color: @gray;
     display: block;
     float: left;
-    font-size: @font-size;
-    margin-bottom: @margin;
-    margin-right: @margin;
-    padding: (@padding + 1) @padding @padding @padding;
+    font-size: @tag-font-size;
+    margin-bottom: @tag-margin;
+    margin-right: @tag-margin;
+    padding: (@tag-padding + 1) @tag-padding @tag-padding @tag-padding;
     text-decoration: none;
     vertical-align: middle;
-    line-height: @height;
-    height: @height;
+    line-height: @tag-height;
+    height: @tag-height;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }      
 
+
+// The x to close a tag
 .tagmanagerRemoveTag
 {
     color: @silver;
-    padding-left: @remove-link-padding;
+    padding-left: @remove-padding;
 }
 
