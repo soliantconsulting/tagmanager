@@ -1,0 +1,18 @@
+{
+  "name": "tagmanager",
+  "version": "1.0.0",
+  "description": "An extensible jQuery tag manager",
+  "main": "tagmanager.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TomHAnderson/tagmanager"
+  },
+  "keywords": [
+    "tag",
+    "manager",
+    "typeahead"
+  ],
+  "author": "Soliant Consulting",
+  "license": "MIT",
+  "readmeFilename": "README.md"
+}
