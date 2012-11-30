@@ -9,11 +9,11 @@ Style sheets are written in LESS.
 
 Install
 -------
-npm install https://github.com/TomHAnderson/tagmanager/tarball/master
+npm install https://github.com/soliantconsulting/tagmanager/tarball/master
 
 Development
 ------------------
-The home page for this project is http://tomhanderson.github.com/tagmanager
+The home page for this project is http://soliantconsulting.github.com/tagmanager
 
 License
 -------
