@@ -1,254 +1,198 @@
-/**
- * ===================================================
- * Tag Manager
- * https://tagmanager-tomanderson.rhcloud.com
- * ===================================================
- * Copyright 2012 Soliant Consulting
- * http://www.soliantconsulting.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * ==========================================================
- */
-
-$(function() {
-
-    "use strict"; // jshint ;_;
-
-    $.fn.tagManager = function(options) {
-        var defaultOptions = {
+var TagManager = (function () {
+    function TagManager(element, options) {
+        var defaults = {
             strategy: 'array',
             tagFieldName: 'tags[]',
             ajaxCreate: null,
             ajaxDelete: null,
             initialCap: true,
-            backspaceChars: [ 8 ],
-            delimiterChars: [ 13, 44, 188 ],
-            createHandler: function(tagManager, tag, isImport) {
+            backspaceChars: [
+                8
+            ],
+            delimiterChars: [
+                13, 
+                44, 
+                188
+            ],
+            createHandler: function (tagManager, tag, isImport) {
                 return;
             },
-            deleteHandler: function(tagManager, tag, isEmpty) {
+            deleteHandler: function (tagManager, tag, isEmpty) {
                 return;
             },
-            createElementHandler: function(tagManager, tagElement, isImport) {
-                $(tagManager).before(tagElement);
+            createElementHandler: function (tagManager, tagElement, isImport) {
+                tagManager.$element.before(tagElement);
             },
-            validateHandler: function(tagManager, tag, isImport) {
+            validateHandler: function (tagManager, tag, isImport) {
                 return tag;
             }
         };
-
-        $.extend(defaultOptions, options);
-        $(this).data('options', defaultOptions);
-        $(this).data('tagIds', [ ]);
-        $(this).data('tagStrings', [ ]);
-
-        /**
-         * Bind remove tag icon
-         */
-        $('a.tagmanagerRemoveTag').live('click', function(e) {
-            $($(this).parent().data('tagmanager')).trigger('delete',
-                [ $(this).parent() ]);
-            return false;
-        });
-
-        /**
-         * Empty the tag manager
-         */
-        $(this).on('empty', function(e) {
-            var tagmanager = this;
-            $($(this).data('tagIds')).each(function(index, value) {
-                $(tagmanager).trigger('delete', [ $('#' + value), true ]);
-            });
-        });
-
-        /**
-         * Delete the last tag
-         */
-        $(this).on('pop', function (e) {
-            if ($(this).data('tagIds').length > 0) {
-                $(this).trigger('delete', [ $('#' +
-                    $(this).data('tagIds')[$(this).data('tagIds').length - 1]) ]);
-            }
-        });
-
-        /**
-         * Delete a tag
-         */
-        $(this).on('delete', function(e, tagHtml, isEmpty) {
-
-            if ($(this).data('options').deleteHandler)
-                $(this).data('options').deleteHandler($(this), $(tagHtml).attr('tag'), isEmpty);
-
-            if ($(this).data('options').strategy == 'ajax' &&
-                $(this).data('options').ajaxDelete &&
-                !isEmpty) {
-                $.ajax({
-                    url: $(this).data('options').ajaxDelete,
-                    type: 'post',
-                    data: {
-                        tag: $(tagHtml).attr('tag')
-                    },
-                    dataType: 'json'
-                });
-            }
-
-            var index = $.inArray($(tagHtml).attr('id'), $(this).data('tagIds'));
-            $(this).data('tagStrings').splice(index, 1);
-            $(this).data('tagIds').splice(index, 1);
-
-            $(tagHtml).remove();
-        });
-
-        /**
-         * Add a new tag
-         */
-         $(this).on('create', function (e, rawTag, isImport)
-         {
-            var tag = $.trim(rawTag);
-            if (!tag) {
-                $(this).val('');
-                return;
-            }
-
-            // Caps first letter
-            if ($(this).data('options').initialCap) {
-                tag = tag.charAt(0).toUpperCase() + tag.slice(1);
-            }
-
-            // Validate Tag
-            tag = $(this).data('options').validateHandler($(this), tag, isImport);
-            if (!tag) {
-                $(this).val('');
-                return;
-            }
-
-            // Run ajax
-            if ($(this).data('options').strategy == 'ajax' &&
-                $(this).data('options').ajaxCreate &&
-                !isImport) {
-                $.ajax({
-                    url: $(this).data('options').ajaxCreate,
-                    type: 'post',
-                    data: {
-                        tag: tag
-                    },
-                    dataType: 'json'
-                });
-            }
-
-            // Run create handler
-            if ($(this).data('options').createHandler)
-                $(this).data('options').createHandler($(this), tag, isImport);
-
-            // Build new tag
-            var randomString = function(length) {
-                var result = '';
-                var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-                return result;
-            };
-
-            var tagId = 'tag_' + randomString(32);
-            var newTagRemoveId = 'tag_remove_' + tagId;
-
-            $(this).data('tagStrings').push(tag);
-            $(this).data('tagIds').push(tagId);
-
-            var tagHtml = $('<span />')
-                .addClass('tagmanagerTag')
-                .attr('tag', tag)
-                .attr('id', tagId)
-                .data('tagmanager', this)
-                .text(tag);
-
-            // Handle array strategy
-            if ($(this).data('options').strategy == 'array') {
-                $('<input>')
-                    .attr('type', 'hidden')
-                    .attr('name', $(this).data('options').tagFieldName)
-                    .val(tag)
-                    .appendTo(tagHtml);
-            }
-
-            // Build remove link
-            var tagRemover = $('<a />')
-                .addClass('tagmanagerRemoveTag')
-                .attr('title', 'Remove')
-                .attr('href', '#')
-                .text('x')
-                .appendTo(tagHtml);
-
-            // Run create element handler
-            $(this).data('options').createElementHandler($(this), tagHtml, isImport);
-
-            $(this).val('');
-            $(this).focus();
-        });
-
-        /**
-         * Import prefilled tags without triggering ajaxCreate
-         */
-        $(this).on('import', function (e, tags) {
-            var field = this;
-
-            if (typeof (tags) == "object") {
-                $.each(tags, function (key, val) {
-                    $(field).trigger('create', [ val, true ]);
-                });
-            } else if (typeof (tags) == "string") {
-                $.each(tags.split(','), function (key, val) {
-                    $(field).trigger('create', [ val, true ]);
-                });
-            }
-        });
-
-        /**
-         * If backspace then delete latest tag
-         */
-        $(this).keydown(function(e) {
-            if ($.inArray(e.which, $(this).data('options').backspaceChars) != -1) {
-                if (!$(this).val()) {
-                    e.preventDefault();
-                    $(this).trigger('pop');
-                }
-            }
-        });
-
-        /**
-         * If a delimiting key is pressed, add the current value
-         */
-        $(this).keypress(function(e) {
-            if ($.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
+        this.$element = $(element);
+        this.tagIds = [];
+        this.tagStrings = [];
+        $(element).data('tagmanager', this);
+        this.options = $.extend({
+        }, defaults, options);
+        this.listen();
+    }
+    TagManager.prototype.keypress = function (e) {
+        if($.inArray(e.which, this.options.backspaceChars) != -1) {
+            if(!this.$element.val()) {
                 e.preventDefault();
-                e.stopPropagation();
-
-                // If the bootstrap typeahead is active use that value else use field value
-                if ($(this).data('typeahead') &&
-                    $(this).data('typeahead').shown &&
-                    $(this).data('typeahead').$menu.find('.active').length
-                ) {
-                    return false;
-                }
-
-                $(this).trigger('create', [ $(this).val() ]);
+                this.pop();
             }
+        }
+        if($.inArray(e.which, this.options.delimiterChars) != -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            if($(this).data('typeahead') && $(this).data('typeahead').shown && $(this).data('typeahead').$menu.find('.active').length) {
+                return false;
+            }
+            this.create(this.$element.val());
+        }
+    };
+    TagManager.prototype.empty = function () {
+        manager = this;
+        $(this.tagIds).each(function (index, value) {
+            manager.delete(value, true);
         });
     };
-});
+    TagManager.prototype.pop = function () {
+        if(this.tagIds.length > 0) {
+            this.delete(this.tagIds[this.tagIds.length - 1]);
+        }
+    };
+    TagManager.prototype.delete = function (tagId, isEmpty) {
+        var tagString = $('#' + tagId).attr('tag');
+        if(this.options.deleteHandler) {
+            this.options.deleteHandler(this, tagString, isEmpty);
+        }
+        if(this.options.strategy = 'ajax' && this.options.ajaxDelete && !isEmpty) {
+            $.ajax({
+                url: this.options.ajaxDelete,
+                type: 'post',
+                data: {
+                    tag: tagString
+                },
+                dataType: 'json'
+            });
+        }
+        var index = $.inArray(tagId, this.tagIds);
+        this.tagStrings.splice(index, 1);
+        this.tagIds.splice(index, 1);
+        $('#' + tagId).remove();
+    };
+    TagManager.prototype.import = function (tags) {
+        manager = this;
+        $.each(tags, function (key, val) {
+            manager.create(val, true);
+        });
+    };
+    TagManager.prototype.create = function (rawTag, isImport) {
+        var tag = $.trim(rawTag);
+        if(!tag) {
+            this.$element.val('');
+            return;
+        }
+        if(this.options.initialCap) {
+            tag = tag.charAt(0).toUpperCase() + tag.slice(1);
+        }
+        tag = this.options.validateHandler(this, tag, isImport);
+        if(!tag) {
+            this.$element.val('');
+            return;
+        }
+        if(this.options.strategy = 'ajax' && this.options.ajaxCreate && !isImport) {
+            $.ajax({
+                url: this.options.ajaxCreate,
+                type: 'post',
+                data: {
+                    tag: tag
+                },
+                dataType: 'json'
+            });
+        }
+        if(this.options.createHandler) {
+            this.options.createHandler(this, tag, isImport);
+        }
+        var randomString = function (length) {
+            var result = '';
+            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for(var i = length; i > 0; --i) {
+                result += chars[Math.round(Math.random() * (chars.length - 1))];
+            }
+            return result;
+        };
+        var id = 'tag_' + randomString(32);
+        this.tagIds.push(id);
+        this.tagStrings.push(tag);
+        var tagClass = new Tag(this, id, tag);
+        this.options.createElementHandler(this, tagClass.render(), isImport);
+        this.$element.val('');
+        this.$element.focus();
+    };
+    TagManager.prototype.listen = function () {
+        this.$element.on('keypress', $.proxy(this.keypress, this));
+    };
+    return TagManager;
+})();
+var Tag = (function () {
+    function Tag(manager, id, value) {
+        this.setManager(manager);
+        this.setId(id);
+        this.setTag(value);
+    }
+    Tag.prototype.getManager = function () {
+        return this.manager;
+    };
+    Tag.prototype.setManager = function (value) {
+        this.manager = value;
+        return this;
+    };
+    Tag.prototype.getId = function () {
+        return this.id;
+    };
+    Tag.prototype.setId = function (value) {
+        this.id = value;
+        return this;
+    };
+    Tag.prototype.getTag = function () {
+        return this.tag;
+    };
+    Tag.prototype.setTag = function (value) {
+        this.tag = value;
+        return this;
+    };
+    Tag.prototype.validate = function () {
+        if(this.getManager().options.strategy == 'array' && !this.getManager().options.tagFieldName) {
+            alert('Array strategy used with no field name');
+        }
+    };
+    Tag.prototype.render = function () {
+        this.validate();
+        var tagHtml = $('<span />').addClass('tagmanagerTag').attr('tag', this.getTag()).attr('id', this.getId()).data('tagmanager', this.getManager()).text(this.getTag());
+        if(this.getManager().options.strategy == 'array') {
+            $('<input>').attr('type', 'hidden').attr('name', this.getManager().options.tagFieldName).val(this.getTag()).appendTo(tagHtml);
+        }
+        var tagRemover = $('<a />').addClass('tagmanagerRemoveTag').attr('title', 'Remove').attr('href', '#').text('x').appendTo(tagHtml);
+        var id = this.getId();
+        var manager = this.getManager();
+        $(tagRemover).click(function (e) {
+            manager.delete(id);
+            return false;
+        });
+        return tagHtml;
+    };
+    return Tag;
+})();
+$.fn.tagmanager = function (option) {
+    return this.each(function () {
+        var $this = $(this), data = $this.data('tagmanager'), options = typeof option == 'object' && option;
+        if(!data) {
+            $this.data('tagmanager', (data = new TagManager(this, options)));
+        }
+        if(typeof option == 'string') {
+            data[option]();
+        }
+    });
+};
