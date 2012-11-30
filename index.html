@@ -10,7 +10,7 @@
         <link href="css/tagmanager.css" media="screen" rel="stylesheet" type="text/css">
         <link href="bootstrap/docs/assets/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
         <link href="bootstrap/docs/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="http://db.etree.org/images/ico/tag_green.png" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        <link href="images/tag_green.png" rel="shortcut icon" type="image/vnd.microsoft.icon">
         <!-- Scripts -->
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
@@ -163,7 +163,7 @@
                         </li>
                         <li>
                             <span class="submenux">x</span>
-                            <a href="#events">Events</a>
+                            <a href="#methods">Methods</a>
                         </li>
                         <li>
                             <span class="submenux">x</span>
@@ -180,7 +180,8 @@
                             Support is specifically built in for Bootstrap typeahead.
                             <br>
                             <br>
-                            Style sheets are written in LESS for easy customization.
+                            Javscript is written in <a href="http://www.typescriptlang.org/">TypeScript</a>.
+                            Style sheets are written in <a href="http://lesscss.org/">LESS</a> for easy customization.
                         </div>
                     </section>
                     <section id="examples">
@@ -191,50 +192,49 @@
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example1').tagManager();
+                                        $('#example1').tagmanager();
                                     });
                                 </script>
                                 <input name="tags1" placeholder="Add Tags" id="example1" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags1_source">view source</a>
                                 <div id="tags1_source" style="display: none;">
-                                    <pre>$('#example1').tagManager();</pre>
+                                    <pre>$('#example1').tagmanager();</pre>
                                 </div>
                             </form>
 
-                            <h3>Bulk Tag Handling Events</h3>
+                            <h3>Bulk Tag Handling Methods</h3>
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example2').tagManager();
-                                        $('#example2').trigger('import',
-                                            [ [ 'Tag A', 'Tag B' ] ]);
+                                        $('#example2').tagmanager();
+                                        $('#example2').data('tagmanager').import([ 'Tag A', 'Tag B' ]);
                                     });
                                 </script>
                                 <input name="tags2" placeholder="Add Tags" id="example2" autocomplete="off" type="text">
-                                <button onclick="$('#example2').trigger('import', [ [ 'Tag A', 'Tag B' ] ]); return false;">Import</button>
-                                <button onclick="$('#example2').trigger('empty'); return false;">Empty</button>
+                                <button onclick="$('#example2').data('tagmanager').import( [ 'Tag A', 'Tag B' ] ); return false;">Import</button>
+                                <button onclick="$('#example2').data('tagmanager').empty();; return false;">Empty</button>
                                 <a href="#" class="source" target="tags2_source">view source</a>
                                 <div id="tags2_source" style="display: none;">
 <pre>&lt;button onClick="
-    $('#example2').trigger('import', [ [ 'Tag A', 'Tag B' ] ]);
+    $('#example2').data('tagmanager').import([ 'Tag A', 'Tag B' ]);
     return false;
 "&gt;Import&lt;/button&gt;
 
 &lt;button onClick="
-    $('#example2').trigger('empty');
+    $('#example2').data('tagmanager').empty();
     return false;
 "&gt;Empty&lt;/button&gt;
 </pre>
                                 </div>
                             </form>
                             <br>
-                            These events are used to initially populate the tag manager and reset it.
+                            These methods are used to initially populate the tag manager and reset it.
 
                             <h3>Validate Handler</h3>
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example6').tagManager({
+                                        $('#example6').tagmanager({
                                             validateHandler: function(tagManager, tag, isImport) {
                                                 if (isImport) return tag;
 
@@ -252,7 +252,7 @@
                                 <input name="tags6" placeholder="Add Tags" id="example6" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags6_source">view source</a>
                                 <div id="tags6_source" style="display: none;">
-<pre>$('#example6').tagManager({
+<pre>$('#example6').tagmanager({
     validateHandler: function(tagManager, tag, isImport) {
         if (isImport) return tag;
 
@@ -275,36 +275,36 @@
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example4').tagManager({
+                                        $('#example4').tagmanager({
                                             validateHandler: function(tagManager, tag, isImport) {
                                                 if (isImport) return tag;
 
-                                                var index = $.inArray(tag, $(tagManager).data('tagStrings'));
+                                                var index = $.inArray(tag, tagManager.tagStrings);
                                                 if (index != -1) {
-                                                    $('#' + $(tagManager).data('tagIds')[index]).effect(
+                                                    $('#' + tagManager.tagIds[index]).effect(
                                                         "highlight", {}, 3000);
                                                     return false;
                                                 }
                                                 return tag;
-                                             }
+                                            }
                                         });
                                     });
                                 </script>
                                 <input name="tags4" placeholder="Add Tags" id="example4" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags4_source">view source</a>
                                 <div id="tags4_source" style="display: none;">
-<pre>$('#example4').tagManager({
+<pre>$('#example4').tagmanager({
     validateHandler: function(tagManager, tag, isImport) {
         if (isImport) return tag;
 
-        var index = $.inArray(tag, $(tagManager).data('tagStrings'));
+        var index = $.inArray(tag, tagManager.tagStrings);
         if (index != -1) {
-            $('#' + $(tagManager).data('tagIds')[index]).effect(
+            $('#' + tagManager.tagIds[index]).effect(
                 "highlight", {}, 3000);
             return false;
         }
         return tag;
-     }
+    }
 });
 </pre>
                                 </div>
@@ -316,15 +316,15 @@
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example7').tagManager({
+                                        $('#example7').tagmanager({
                                             validateHandler: function(tagManager, tag, isImport) {
                                                 if (isImport) return tag;
 
                                                 var maxTags = 3;
-                                                var tagCount = $(tagManager).data('tagIds').length;
+                                                var tagCount = tagManager.tagIds.length;
 
                                                 if (tagCount == maxTags - 1) {
-                                                    $(tagManager).attr('placeholder', 'Maximum of ' +
+                                                    tagManager.$element.attr('placeholder', 'Maximum of ' +
                                                         maxTags + ' tags');
                                                 }
 
@@ -336,7 +336,7 @@
                                             },
 
                                             deleteHandler: function(tagManager, tag, isEmpty) {
-                                                $(tagManager).attr('placeholder', 'Add Tags');
+                                                tagManager.$element.attr('placeholder', 'Add Tags');
                                             }
                                         });
                                     });
@@ -344,15 +344,15 @@
                                 <input name="tags7" placeholder="Add Tags" id="example7" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags7_source">view source</a>
                                 <div id="tags7_source" style="display: none;">
-<pre>$('#example7').tagManager({
+<pre>$('#example7').tagmanager({
     validateHandler: function(tagManager, tag, isImport) {
         if (isImport) return tag;
 
         var maxTags = 3;
-        var tagCount = $(tagManager).data('tagIds').length;
+        var tagCount = tagManager.tagIds.length;
 
         if (tagCount == maxTags - 1) {
-            $(tagManager).attr('placeholder', 'Maximum of ' +
+            tagManager.$element.attr('placeholder', 'Maximum of ' +
                 maxTags + ' tags');
         }
 
@@ -364,7 +364,7 @@
     },
 
     deleteHandler: function(tagManager, tag, isEmpty) {
-        $(tagManager).attr('placeholder', 'Add Tags');
+        tagManager.$element.attr('placeholder', 'Add Tags');
     }
 });
 </pre>
@@ -375,7 +375,7 @@
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example5').tagManager({
+                                        $('#example5').tagmanager({
                                             createElementHandler: function(tagManager, tagElement, isImport) {
                                                 $(tagElement).css('float', 'none');
                                                 $(tagElement).appendTo('#createElementHandlerBox');
@@ -386,7 +386,7 @@
                                 <input name="tags5" placeholder="Add Tags" id="example5" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags5_source">view source</a><br>
                                 <div id="tags5_source" style="display: none;">
-<pre>$('#example5').tagManager({
+<pre>$('#example5').tagmanager({
     createElementHandler: function(tagManager, tagElement, isImport) {
         $(tagElement).css('float', 'none');
         $(tagElement).appendTo('#createElementHandlerBox');
@@ -403,7 +403,7 @@
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
-                                        $('#example3').tagManager({
+                                        $('#example3').tagmanager({
                                             delimiterChars: [ 13, 44, 188 ],
                                         });
 
@@ -411,7 +411,7 @@
                                             source: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'],
                                             suppressKeyPressRepeat: true,
                                             updater: function(tag) {
-                                                this.$element.trigger('create', [ tag ]);
+                                                this.$element.data('tagmanager').create([ tag ]);
                                                 this.hide();
                                             }
                                         });
@@ -420,7 +420,7 @@
                                 <input name="tags3" placeholder="Add Tags" id="example3" autocomplete="off" type="text">
                                 <a href="#" class="source" target="tags3_source">view source</a>
                                 <div id="tags3_source" style="display: none;">
-<pre>$('#example3').tagManager({
+<pre>$('#example3').tagmanager({
     delimiterChars: [ 13, 44, 188 ],
 });
 
@@ -428,7 +428,7 @@ $('#example3').typeahead({
     source: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'],
     suppressKeyPressRepeat: true,
     updater: function(tag) {
-        this.$element.trigger('create', [ tag ]);
+        this.$element.data('tagmanager').create([ tag ]);
         this.hide();
     }
 });
@@ -453,10 +453,10 @@ $('#example3').typeahead({
 </pre>
 
                         <h3>Javascript</h3>
-                        <pre>$('#tagmanager').tagManager();</pre>
+                        <pre>$('#tagmanager').tagmanager();</pre>
 
                         <h3>Configuration</h3>
-<pre>$('#tagmanager').tagManager({
+<pre>$('#tagmanager').tagmanager({
     strategy: 'array',
     tagFieldName: 'tags[]',
     ajaxCreate: 'http://localhost/tag/create',
@@ -471,7 +471,7 @@ $('#example3').typeahead({
         return;
     },
     createElementHandler: function(tagManager, tagElement, isImport) {
-        $(tagManager).before(tagElement);
+        tagManager.$element.before(tagElement);
     },
     validateHandler: function(tagManager, tag, isImport) {
         return tag;
@@ -486,7 +486,7 @@ $('#example3').typeahead({
                         <div class="specification">
                             <table>
                                 <caption>
-                                    <pre>$('#tagmanager').data('config').optionName;</pre>
+                                    <pre>$('#tagmanager').data('tagmanager').options.optionName;</pre>
                                 </caption>
                                 <thead>
                                     <tr>
@@ -544,7 +544,7 @@ $('#example3').typeahead({
                         <div class="specification">
                             <table>
                                 <caption>
-                                    <pre>$('#tagmanager').data('config').optionName;</pre>
+                                    <pre>$('#tagmanager').data('tagmanager').options.optionName;</pre>
                                 </caption>
                                 <thead>
                                     <tr>
@@ -590,7 +590,7 @@ $('#example3').typeahead({
                         <div class="specification">
                             <table>
                                 <caption>
-                                    <pre>$('#tagmanager').data('config').handlerName;</pre>
+                                    <pre>$('#tagmanager').data('tagmanager').options.handlerName;</pre>
                                 </caption>
                                 <thead>
                                     <tr>
@@ -605,12 +605,13 @@ $('#example3').typeahead({
                                         <td>tagManager, tag, isImport</td>
                                         <td>Fired when a new tag is created with the
              tag manager.  Fired before createElementHandler.  No return value.
-            isImport will be true if fired from the import event.</td>
+            isImport will be true if fired from the import method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
                                         <td>deleteHandler</td>
                                         <td>tagManager, tag, isEmpty</td>
-                                        <td>Fired when a tag is deleted from the tag manager.  No return value.  isEmpty will be true if fired from the empty event.</td>
+                                        <td>Fired when a tag is deleted from the tag manager.  No return value.
+                                        isEmpty will be true if fired from the empty method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(255, 255, 255);">
                                         <td>createElementHandler</td>
@@ -618,7 +619,7 @@ $('#example3').typeahead({
                                         <td>When a tag is created in the manager
             this function will pass the genereated jQuery element as a parameter so
             it can be processed and placed anywhere on the page.  isImport will be
-            true if fired from the import event.</td>
+            true if fired from the import method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
                                         <td>validateHandler</td>
@@ -626,7 +627,7 @@ $('#example3').typeahead({
                                         <td>If the validator handler returns false
             the tag will not be created.  If the validator handler returns any other
              value that value will be created instead of the original value.
-            isImport will be true if fired from the import event.</td>
+            isImport will be true if fired from the import method.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -641,9 +642,9 @@ $('#example3').typeahead({
                                 </caption>
                                 <thead>
                                     <tr>
-                                        <th>Event Name</th>
+                                        <th>Method Name</th>
                                         <th>Handler</th>
-                                        <th>Can Cancel Event</th>
+                                        <th>Can Cancel</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -672,16 +673,16 @@ $('#example3').typeahead({
                         </div>
                     </section>
 
-                    <section id="events">
-                        <h2>Events</h2>
+                    <section id="methods">
+                        <h2>Methods</h2>
                         <div class="specification">
                             <table>
                                 <caption>
-                                    <pre>$('#tagmanager').trigger(eventName, [ parameter1, parameter2 ]);</pre>
+                                    <pre>$('#tagmanager').data('tagmanager').methodName(parameter1, parameter2);</pre>
                                 </caption>
                                 <thead>
                                     <tr>
-                                        <th>Event Name</th>
+                                        <th>Method Name</th>
                                         <th>Parameters</th>
                                         <th>Description</th>
                                     </tr>
@@ -728,7 +729,7 @@ $('#example3').typeahead({
                         <div class="specification">
                             <table width="100%">
                                 <caption>
-                                    <pre>$('#tagmanager').data(fieldName);</pre>
+                                    <pre>$('#tagmanager').data('tagmanager').fieldName;</pre>
                                 </caption>
 
                                 <thead>
@@ -739,7 +740,7 @@ $('#example3').typeahead({
                                 </thead>
                                 <tbody>
                                     <tr style="background-color: rgb(255, 255, 255);">
-                                        <td>config</td>
+                                        <td>options</td>
                                         <td>An object with the complete tag manager configuration.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">

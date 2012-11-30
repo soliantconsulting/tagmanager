@@ -30,9 +30,9 @@ var TagManager = (function () {
         this.$element = $(element);
         this.tagIds = [];
         this.tagStrings = [];
-        $(element).data('tagmanager', this);
         this.options = $.extend({
         }, defaults, options);
+        $(element).data('tagmanager', this);
         this.listen();
     }
     TagManager.prototype.keypress = function (e) {
@@ -45,14 +45,14 @@ var TagManager = (function () {
         if($.inArray(e.which, this.options.delimiterChars) != -1) {
             e.preventDefault();
             e.stopPropagation();
-            if($(this).data('typeahead') && $(this).data('typeahead').shown && $(this).data('typeahead').$menu.find('.active').length) {
+            if(this.$element.data('typeahead') && this.$element.data('typeahead').shown && this.$element.data('typeahead').$menu.find('.active').length) {
                 return false;
             }
             this.create(this.$element.val());
         }
     };
     TagManager.prototype.empty = function () {
-        manager = this;
+        var manager = this;
         $(this.tagIds).each(function (index, value) {
             manager.delete(value, true);
         });
@@ -83,7 +83,7 @@ var TagManager = (function () {
         $('#' + tagId).remove();
     };
     TagManager.prototype.import = function (tags) {
-        manager = this;
+        var manager = this;
         $.each(tags, function (key, val) {
             manager.create(val, true);
         });
