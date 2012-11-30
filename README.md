@@ -5,9 +5,13 @@ Introduction
 ------------
 An extensible jQuery tag manager 
 
+Install
+-------
+npm install https://github.com/TomHAnderson/tagmanager/tarball/master
+
 Development
 ------------------
-The home page for this project is http://tagmanager-tomanderson.rhcloud.com
+The home page for this project is http://tomhanderson.github.com/tagmanager
 
 License
 -------
