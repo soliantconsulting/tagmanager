@@ -3,7 +3,9 @@ Tag Manager
 
 Introduction
 ------------
-An extensible jQuery tag manager 
+An extensible jQuery tag manager.
+Javscript is written in TypeScript. 
+Style sheets are written in LESS. 
 
 Install
 -------
