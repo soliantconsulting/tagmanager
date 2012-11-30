@@ -220,17 +220,6 @@ $(function() {
         });
 
         /**
-         * Prevent submit on enter
-         */
-        $(this).keypress(function(e) {
-            if (e.which == 13 &&
-                $.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
-                e.stopPropagation();
-                e.preventDefault();
-            }
-        });
-
-        /**
          * If backspace then delete latest tag
          */
         $(this).keydown(function(e) {
@@ -245,9 +234,10 @@ $(function() {
         /**
          * If a delimiting key is pressed, add the current value
          */
-        $(this).keyup(function (e) {
+        $(this).keypress(function(e) {
             if ($.inArray(e.which, $(this).data('options').delimiterChars) != -1) {
                 e.preventDefault();
+                e.stopPropagation();
 
                 // If the bootstrap typeahead is active use that value else use field value
                 if ($(this).data('typeahead') &&
@@ -256,10 +246,6 @@ $(function() {
                 ) {
                     return false;
                 }
-
-                // For non enter keystrokes trim last character from value
-                if (e.which != 13)
-                    $(this).val($(this).val().substr(0, $(this).val().length -1));
 
                 $(this).trigger('create', [ $(this).val() ]);
             }
