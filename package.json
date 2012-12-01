@@ -1,7 +1,7 @@
 {
   "name": "tagmanager",
   "version": "1.0.0",
-  "description": "An extensible jQuery tag manager",
+  "description": "An extensible tag manager",
   "main": "tagmanager.js",
   "repository": {
     "type": "git",
