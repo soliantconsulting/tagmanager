@@ -1,7 +1,7 @@
 /**
  * ===================================================
  * Tag Manager
- * https://tagmanager-tomanderson.rhcloud.com
+ * http://soliantconsulting.github.com/tagmanager/
  * ===================================================
  * Copyright 2012 Soliant Consulting
  * http://www.soliantconsulting.com
