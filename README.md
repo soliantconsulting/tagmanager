@@ -3,13 +3,13 @@ Tag Manager
 
 Introduction
 ------------
-An extensible jQuery tag manager.
-Javscript is written in TypeScript. 
-Style sheets are written in LESS. 
+An extensible javascript tag manager. jQuery is required. 
+Support is specifically built in for Bootstrap typeahead. 
+Javscript is written in TypeScript. Style sheets are written in LESS for easy customization. 
 
 Install
 -------
-npm install https://github.com/soliantconsulting/tagmanager/tarball/master
+npm install tagmanager
 
 Development
 ------------------
