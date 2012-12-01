@@ -30,6 +30,8 @@ var TagManager = (function () {
         this.$element = $(element);
         this.tagIds = [];
         this.tagStrings = [];
+        var hat = require('hat');
+        this.rack = hat.rack();
         this.options = $.extend({
         }, defaults, options);
         $(element).data('tagmanager', this);
@@ -115,15 +117,7 @@ var TagManager = (function () {
         if(this.options.createHandler) {
             this.options.createHandler(this, tag, isImport);
         }
-        var randomString = function (length) {
-            var result = '';
-            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            for(var i = length; i > 0; --i) {
-                result += chars[Math.round(Math.random() * (chars.length - 1))];
-            }
-            return result;
-        };
-        var id = 'tag_' + randomString(32);
+        var id = 'tag_' + this.rack();
         this.tagIds.push(id);
         this.tagStrings.push(tag);
         var tagClass = new Tag(this, id, tag);
@@ -138,45 +132,24 @@ var TagManager = (function () {
 })();
 var Tag = (function () {
     function Tag(manager, id, value) {
-        this.setManager(manager);
-        this.setId(id);
-        this.setTag(value);
-    }
-    Tag.prototype.getManager = function () {
-        return this.manager;
-    };
-    Tag.prototype.setManager = function (value) {
-        this.manager = value;
-        return this;
-    };
-    Tag.prototype.getId = function () {
-        return this.id;
-    };
-    Tag.prototype.setId = function (value) {
-        this.id = value;
-        return this;
-    };
-    Tag.prototype.getTag = function () {
-        return this.tag;
-    };
-    Tag.prototype.setTag = function (value) {
+        this.manager = manager;
+        this.id = id;
         this.tag = value;
-        return this;
-    };
+    }
     Tag.prototype.validate = function () {
-        if(this.getManager().options.strategy == 'array' && !this.getManager().options.tagFieldName) {
+        if(this.manager.options.strategy == 'array' && !this.manager.options.tagFieldName) {
             alert('Array strategy used with no field name');
         }
     };
     Tag.prototype.render = function () {
         this.validate();
-        var tagHtml = $('<span />').addClass('tagmanagerTag').attr('tag', this.getTag()).attr('id', this.getId()).data('tagmanager', this.getManager()).text(this.getTag());
-        if(this.getManager().options.strategy == 'array') {
-            $('<input>').attr('type', 'hidden').attr('name', this.getManager().options.tagFieldName).val(this.getTag()).appendTo(tagHtml);
+        var tagHtml = $('<span />').addClass('tagmanagerTag').attr('tag', this.tag).attr('id', this.id).data('tagmanager', this.manager).text(this.tag);
+        if(this.manager.options.strategy == 'array') {
+            $('<input>').attr('type', 'hidden').attr('name', this.manager.options.tagFieldName).val(this.tag).appendTo(tagHtml);
         }
         var tagRemover = $('<a />').addClass('tagmanagerRemoveTag').attr('title', 'Remove').attr('href', '#').text('x').appendTo(tagHtml);
-        var id = this.getId();
-        var manager = this.getManager();
+        var id = this.id;
+        var manager = this.manager;
         $(tagRemover).click(function (e) {
             manager.delete(id);
             return false;

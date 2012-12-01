@@ -28,11 +28,15 @@
  */
 
 /// <reference path="jquery.d.ts" />
+
+declare function require(name: string);
+
 class TagManager {
 
     options;
     tagIds;
     tagStrings;
+    rack;
     $element;
 
     constructor(element, options) {
@@ -62,6 +66,8 @@ class TagManager {
         this.$element = $(element);
         this.tagIds = [ ];
         this.tagStrings = [ ];
+        var hat = require('hat');
+        this.rack = hat.rack();
         this.options = $.extend({}, defaults, options);
 
         $(element).data('tagmanager', this);
@@ -191,15 +197,7 @@ class TagManager {
         if (this.options.createHandler)
             this.options.createHandler(this, tag, isImport);
 
-        // Build new tag
-        var randomString = function(length) {
-            var result = '';
-            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-            return result;
-        };
-
-        var id = 'tag_' + randomString(32);
+        var id = 'tag_' + this.rack();
         this.tagIds.push(id);
         this.tagStrings.push(tag);
         var tagClass = new Tag(this, id, tag);
@@ -216,47 +214,19 @@ class TagManager {
     }
 }
 
-
 class Tag {
     id: string;
     tag: string;
     manager;
 
     constructor (manager, id: string, value: string) {
-        this.setManager(manager);
-        this.setId(id);
-        this.setTag(value);
-    }
-
-    getManager() {
-        return this.manager;
-    }
-
-    setManager(value) {
-        this.manager = value;
-        return this;
-    }
-
-    getId() {
-        return this.id;
-    }
-
-    setId(value: string) {
-        this.id = value;
-        return this;
-    }
-
-    getTag() {
-        return this.tag;
-    }
-
-    setTag(value: string) {
+        this.manager = manager;
+        this.id = id;
         this.tag = value;
-        return this;
     }
 
     validate() {
-        if (this.getManager().options.strategy == 'array' && !this.getManager().options.tagFieldName) {
+        if (this.manager.options.strategy == 'array' && !this.manager.options.tagFieldName) {
             alert('Array strategy used with no field name');
             // throw exception
         }
@@ -268,17 +238,17 @@ class Tag {
 
         var tagHtml = $('<span />')
             .addClass('tagmanagerTag')
-            .attr('tag', this.getTag())
-            .attr('id', this.getId())
-            .data('tagmanager', this.getManager())
-            .text(this.getTag());
+            .attr('tag', this.tag)
+            .attr('id', this.id)
+            .data('tagmanager', this.manager)
+            .text(this.tag);
 
         // Handle array strategy
-        if (this.getManager().options.strategy == 'array') {
+        if (this.manager.options.strategy == 'array') {
             $('<input>')
                 .attr('type', 'hidden')
-                .attr('name', this.getManager().options.tagFieldName)
-                .val(this.getTag())
+                .attr('name', this.manager.options.tagFieldName)
+                .val(this.tag)
                 .appendTo(tagHtml);
         }
 
@@ -290,8 +260,8 @@ class Tag {
             .text('x')
             .appendTo(tagHtml);
 
-        var id = this.getId();
-        var manager = this.getManager();
+        var id = this.id;
+        var manager = this.manager;
 
         $(tagRemover).click(function(e) {
             manager.delete(id);
