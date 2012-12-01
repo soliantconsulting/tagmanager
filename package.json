@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git://github.com/soliantconsulting/tagmanager"
   },
+  "dependencies": {
+    "hat": "0.0.3"
+  },
   "keywords": [
     "tag",
     "manager",
