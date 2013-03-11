@@ -30,8 +30,6 @@ var TagManager = (function () {
         this.$element = $(element);
         this.tagIds = [];
         this.tagStrings = [];
-        var hat = require('hat');
-        this.rack = hat.rack();
         this.options = $.extend({
         }, defaults, options);
         $(element).data('tagmanager', this);
@@ -119,7 +117,15 @@ var TagManager = (function () {
         if(this.options.createHandler) {
             this.options.createHandler(this, tag, isImport);
         }
-        var id = 'tag_' + this.rack();
+        var randomString = function (length) {
+            var result = '';
+            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for(var i = length; i > 0; --i) {
+                result += chars[Math.round(Math.random() * (chars.length - 1))];
+            }
+            return result;
+        };
+        var id = 'tag_' + randomString(32);
         this.tagIds.push(id);
         this.tagStrings.push(tag);
         var tagClass = new Tag(this, id, tag);
