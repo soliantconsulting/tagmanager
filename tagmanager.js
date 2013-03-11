@@ -4,7 +4,7 @@ var TagManager = (function () {
             strategy: 'array',
             tagFieldName: 'tags[]',
             ajaxCreate: null,
-            ajaxDelete: null,
+            ajaxRemove: null,
             initialCap: true,
             backspaceChars: [
                 8
@@ -17,8 +17,8 @@ var TagManager = (function () {
             createHandler: function (tagManager, tag, isImport) {
                 return;
             },
-            deleteHandler: function (tagManager, tag, isEmpty) {
-                return;
+            removeHandler: function (tagManager, tag, isEmpty) {
+                return true;
             },
             createElementHandler: function (tagManager, tagElement, isImport) {
                 tagManager.$element.before(tagElement);
@@ -54,22 +54,24 @@ var TagManager = (function () {
     TagManager.prototype.empty = function () {
         var manager = this;
         $(this.tagIds).each(function (index, value) {
-            manager.delete(value, true);
+            manager.remove(value, true);
         });
     };
     TagManager.prototype.pop = function () {
         if(this.tagIds.length > 0) {
-            this.delete(this.tagIds[this.tagIds.length - 1]);
+            this.remove(this.tagIds[this.tagIds.length - 1]);
         }
     };
-    TagManager.prototype.delete = function (tagId, isEmpty) {
+    TagManager.prototype.remove = function (tagId, isEmpty) {
         var tagString = $('#' + tagId).attr('tag');
-        if(this.options.deleteHandler) {
-            this.options.deleteHandler(this, tagString, isEmpty);
+        if(this.options.removeHandler) {
+            if(!this.options.removeHandler(this, tagString, isEmpty)) {
+                return;
+            }
         }
-        if(this.options.strategy = 'ajax' && this.options.ajaxDelete && !isEmpty) {
+        if(this.options.strategy == 'ajax' && this.options.ajaxRemove && !isEmpty) {
             $.ajax({
-                url: this.options.ajaxDelete,
+                url: this.options.ajaxRemove,
                 type: 'post',
                 data: {
                     tag: tagString
@@ -82,7 +84,7 @@ var TagManager = (function () {
         this.tagIds.splice(index, 1);
         $('#' + tagId).remove();
     };
-    TagManager.prototype.import = function (tags) {
+    TagManager.prototype.populate = function (tags) {
         var manager = this;
         $.each(tags, function (key, val) {
             manager.create(val, true);
@@ -102,7 +104,7 @@ var TagManager = (function () {
             this.$element.val('');
             return;
         }
-        if(this.options.strategy = 'ajax' && this.options.ajaxCreate && !isImport) {
+        if(this.options.strategy == 'ajax' && this.options.ajaxCreate && !isImport) {
             $.ajax({
                 url: this.options.ajaxCreate,
                 type: 'post',
@@ -138,47 +140,26 @@ var TagManager = (function () {
 })();
 var Tag = (function () {
     function Tag(manager, id, value) {
-        this.setManager(manager);
-        this.setId(id);
-        this.setTag(value);
-    }
-    Tag.prototype.getManager = function () {
-        return this.manager;
-    };
-    Tag.prototype.setManager = function (value) {
-        this.manager = value;
-        return this;
-    };
-    Tag.prototype.getId = function () {
-        return this.id;
-    };
-    Tag.prototype.setId = function (value) {
-        this.id = value;
-        return this;
-    };
-    Tag.prototype.getTag = function () {
-        return this.tag;
-    };
-    Tag.prototype.setTag = function (value) {
+        this.manager = manager;
+        this.id = id;
         this.tag = value;
-        return this;
-    };
+    }
     Tag.prototype.validate = function () {
-        if(this.getManager().options.strategy == 'array' && !this.getManager().options.tagFieldName) {
+        if(this.manager.options.strategy == 'array' && !this.manager.options.tagFieldName) {
             alert('Array strategy used with no field name');
         }
     };
     Tag.prototype.render = function () {
         this.validate();
-        var tagHtml = $('<span />').addClass('tagmanagerTag').attr('tag', this.getTag()).attr('id', this.getId()).data('tagmanager', this.getManager()).text(this.getTag());
-        if(this.getManager().options.strategy == 'array') {
-            $('<input>').attr('type', 'hidden').attr('name', this.getManager().options.tagFieldName).val(this.getTag()).appendTo(tagHtml);
+        var tagHtml = $('<span />').addClass('tagmanagerTag').attr('tag', this.tag).attr('id', this.id).data('tagmanager', this.manager).text(this.tag);
+        if(this.manager.options.strategy == 'array') {
+            $('<input>').attr('type', 'hidden').attr('name', this.manager.options.tagFieldName).val(this.tag).appendTo(tagHtml);
         }
         var tagRemover = $('<a />').addClass('tagmanagerRemoveTag').attr('title', 'Remove').attr('href', '#').text('x').appendTo(tagHtml);
-        var id = this.getId();
-        var manager = this.getManager();
+        var id = this.id;
+        var manager = this.manager;
         $(tagRemover).click(function (e) {
-            manager.delete(id);
+            manager.remove(id);
             return false;
         });
         return tagHtml;
