@@ -214,18 +214,18 @@
                                 <script>
                                     $(function() {
                                         $('#example2').tagmanager();
-                                        $('#example2').data('tagmanager').import([ 'Tag A', 'Tag B' ]);
+                                        $('#example2').data('tagmanager').createBulk([ 'Tag A', 'Tag B' ]);
                                     });
                                 </script>
                                 <input name="tags2" placeholder="Add Tags" id="example2" autocomplete="off" type="text">
-                                <button onclick="$('#example2').data('tagmanager').import( [ 'Tag A', 'Tag B' ] ); return false;">Import</button>
+                                <button onclick="$('#example2').data('tagmanager').createBulk( [ 'Tag A', 'Tag B' ] ); return false;">Create Bulk</button>
                                 <button onclick="$('#example2').data('tagmanager').empty();; return false;">Empty</button>
                                 <a href="#" class="source" target="tags2_source">view source</a>
                                 <div id="tags2_source" style="display: none;">
 <pre>&lt;button onClick="
-    $('#example2').data('tagmanager').import([ 'Tag A', 'Tag B' ]);
+    $('#example2').data('tagmanager').createBulk([ 'Tag A', 'Tag B' ]);
     return false;
-"&gt;Import&lt;/button&gt;
+"&gt;Create Bulk&lt;/button&gt;
 
 &lt;button onClick="
     $('#example2').data('tagmanager').empty();
