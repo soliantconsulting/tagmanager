@@ -7,10 +7,6 @@ An extensible javascript tag manager. jQuery is required.
 Support is specifically built in for Bootstrap typeahead. 
 Javscript is written in TypeScript. Style sheets are written in LESS for easy customization. 
 
-Install
--------
-npm install tagmanager
-
 Development
 ------------------
 The home page for this project is http://soliantconsulting.github.com/tagmanager
