@@ -186,9 +186,11 @@
                             <br>
                             Javscript is written in <a href="http://www.typescriptlang.org/">TypeScript</a>.
                             Style sheets are written in <a href="http://lesscss.org/">LESS</a> for easy customization.
+<!--
                             <br>
                             <h4>Install with node.js</h4>
                             <pre>npm install tagmanager</pre>
+-->
                         </div>
                     </section>
                     <section id="examples">
@@ -214,16 +216,16 @@
                                 <script>
                                     $(function() {
                                         $('#example2').tagmanager();
-                                        $('#example2').data('tagmanager').createBulk([ 'Tag A', 'Tag B' ]);
+                                        $('#example2').data('tagmanager').populate([ 'Tag A', 'Tag B' ]);
                                     });
                                 </script>
                                 <input name="tags2" placeholder="Add Tags" id="example2" autocomplete="off" type="text">
-                                <button onclick="$('#example2').data('tagmanager').createBulk( [ 'Tag A', 'Tag B' ] ); return false;">Create Bulk</button>
+                                <button onclick="$('#example2').data('tagmanager').populate( [ 'Tag A', 'Tag B' ] ); return false;">Populate</button>
                                 <button onclick="$('#example2').data('tagmanager').empty();; return false;">Empty</button>
                                 <a href="#" class="source" target="tags2_source">view source</a>
                                 <div id="tags2_source" style="display: none;">
 <pre>&lt;button onClick="
-    $('#example2').data('tagmanager').createBulk([ 'Tag A', 'Tag B' ]);
+    $('#example2').data('tagmanager').populate([ 'Tag A', 'Tag B' ]);
     return false;
 "&gt;Create Bulk&lt;/button&gt;
 
@@ -319,7 +321,7 @@
                             <br>
                             Duplicates are not allowed and the existing value is hilighted.
 
-                            <h3>Validate and Delete Handlers for Max Tags</h3>
+                            <h3>Validate and Remove Handlers for Max Tags</h3>
                             <form style="display: inline;">
                                 <script>
                                     $(function() {
@@ -342,8 +344,10 @@
                                                 return tag;
                                             },
 
-                                            deleteHandler: function(tagManager, tag, isEmpty) {
+                                            removeHandler: function(tagManager, tag, isEmpty) {
                                                 tagManager.$element.attr('placeholder', 'Add Tags');
+
+                                                return true;
                                             }
                                         });
                                     });
@@ -370,8 +374,10 @@
         return tag;
     },
 
-    deleteHandler: function(tagManager, tag, isEmpty) {
+    removeHandler: function(tagManager, tag, isEmpty) {
         tagManager.$element.attr('placeholder', 'Add Tags');
+
+        return true;
     }
 });
 </pre>
@@ -443,11 +449,10 @@ $('#example3').typeahead({
                                 </div>
                             </form>
                             <br>
-                            There are two known issues with Bootstrap:
-                            <ol>
-                                <li>Arrow navigation sometimes fires twice (see <a href="https://github.com/twitter/bootstrap/pull/5862">#5862</a>)</li>
-                                <li>Typeahead requires a selected value</li>
-                            </ol>
+                            There is an issue with Bootstrap:
+                                Typeahead requires a selected value.
+                                So if you use typeahead the user must select an existing tag.
+
                         </div>
                     </section>
 
@@ -467,15 +472,15 @@ $('#example3').typeahead({
     strategy: 'array',
     tagFieldName: 'tags[]',
     ajaxCreate: 'http://localhost/tag/create',
-    ajaxDelete: 'http://localhost/tag/delete',
+    ajaxRemove: 'http://localhost/tag/remove',
     initialCap: true,
     backspaceChars: [ 8 ],
     delimiterChars: [ 13, 44, 188 ],
     createHandler: function(tagManager, tag, isImport) {
         return;
     },
-    deleteHandler: function(tagManager, tag, isEmpty) {
-        return;
+    removeHandler: function(tagManager, tag, isEmpty) {
+        return true;
     },
     createElementHandler: function(tagManager, tagElement, isImport) {
         tagManager.$element.before(tagElement);
@@ -512,8 +517,8 @@ $('#example3').typeahead({
             creates a new input field for each tag created with the tag manager.
             The field name is defined with option tagFieldName and must be an array
             such as "tags[]".  The second strategy is ajax which requires ajaxCreate
-             and ajaxDelete options with URLs to post a tag to when created or
-            deleted.  The third strategy is none which requires the programmer to
+             and ajaxRemove options with URLs to post a tag to when created or
+            removed.  The third strategy is none which requires the programmer to
             use <a href="#handlers">handlers</a> to persist tags.
                                         </td>
                                     </tr>
@@ -534,11 +539,11 @@ $('#example3').typeahead({
                                         </td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
-                                        <td>ajaxDelete</td>
+                                        <td>ajaxRemove</td>
                                         <td>string</td>
                                         <td>null</td>
-                                        <td>A URL to post an ajax request to when a tag is deleted.  e.g. http://localhost/tag/delete?id=5
-                                        The <a href="#handlers">deleteHandler</a> can be used for more fine-grained ajax handling.
+                                        <td>A URL to post an ajax request to when a tag is removed/deleted.  e.g. http://localhost/tag/remove?id=5
+                                        The <a href="#handlers">removeHandler</a> can be used for more fine-grained ajax handling.
                                         </td>
                                     </tr>
 
@@ -574,7 +579,7 @@ $('#example3').typeahead({
                                         <td>[ 8 ]</td>
                                         <td>An array of character key codes to
             accept as "backspace" when the field is empty.  When the input field is
-            empty and a backspace character is entered the last tag will be deleted.
+            empty and a backspace character is entered the last tag will be removed.
               Pass an empty array the config to disable this feature.</td>
                                     </tr>
                                     <tr style="background-color: rgb(255, 255, 255);">
@@ -612,12 +617,13 @@ $('#example3').typeahead({
                                         <td>tagManager, tag, isImport</td>
                                         <td>Fired when a new tag is created with the
              tag manager.  Fired before createElementHandler.  No return value.
-            isImport will be true if fired from the import method.</td>
+            isImport will be true if fired from the populate method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
-                                        <td>deleteHandler</td>
+                                        <td>removeHandler</td>
                                         <td>tagManager, tag, isEmpty</td>
-                                        <td>Fired when a tag is deleted from the tag manager.  No return value.
+                                        <td>Fired when a tag is removed from the tag manager.  If
+                                        the return value is true the tag will be removed.
                                         isEmpty will be true if fired from the empty method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(255, 255, 255);">
@@ -626,7 +632,7 @@ $('#example3').typeahead({
                                         <td>When a tag is created in the manager
             this function will pass the genereated jQuery element as a parameter so
             it can be processed and placed anywhere on the page.  isImport will be
-            true if fired from the import method.</td>
+            true if fired from the populate method.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
                                         <td>validateHandler</td>
@@ -634,7 +640,7 @@ $('#example3').typeahead({
                                         <td>If the validator handler returns false
             the tag will not be created.  If the validator handler returns any other
              value that value will be created instead of the original value.
-            isImport will be true if fired from the import method.</td>
+            isImport will be true if fired from the populate method.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -671,9 +677,9 @@ $('#example3').typeahead({
                                         <td>no</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
-                                        <td>delete</td>
-                                        <td><a href="#handlers">deleteHandler</a></td>
-                                        <td>no</td>
+                                        <td>remove</td>
+                                        <td><a href="#handlers">removeHandler</a></td>
+                                        <td>yes</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -704,22 +710,22 @@ $('#example3').typeahead({
                                         </td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
-                                        <td>delete</td>
+                                        <td>remove</td>
                                         <td>tagElement, isEmpty</td>
                                         <td>Removes a tag from the tag manager.  The
              first parameter is the jQuery handle of the tag span created from the
-            tag manager.  The second parameter defaults to false and will not fire <a href="#strategy">ajaxDelete</a> if true.
+            tag manager.  The second parameter defaults to false and will not fire <a href="#strategy">ajaxRemove</a> if true.
                                         </td>
                                     </tr>
                                     <tr style="background-color: rgb(255, 255, 255);">
-                                        <td>import</td>
+                                        <td>populate</td>
                                         <td>tags</td>
                                         <td>Import an array of tags without firing <a href="#strategy">ajaxCreate</a>.</td>
                                     </tr>
                                     <tr style="background-color: rgb(245, 245, 245);">
                                         <td>empty</td>
                                         <td><i>none</i></td>
-                                        <td>Clears all tags from the tag manager without firing <a href="#strategy">ajaxDelete</a>.</td>
+                                        <td>Clears all tags from the tag manager without firing <a href="#strategy">ajaxRemove</a>.</td>
                                     </tr>
                                     <tr style="background-color: rgb(255, 255, 255);">
                                         <td>pop</td>
