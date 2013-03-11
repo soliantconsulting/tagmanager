@@ -45,15 +45,15 @@ class TagManager {
             strategy: 'array'
             , tagFieldName: 'tags[]'
             , ajaxCreate: null
-            , ajaxDelete: null
+            , ajaxRemove: null
             , initialCap: true
             , backspaceChars: [ 8 ]
             , delimiterChars: [ 13, 44, 188 ]
             , createHandler: function(tagManager, tag, isImport?) {
                 return;
             }
-            , deleteHandler: function(tagManager, tag, isEmpty?) {
-                return;
+            , removeHandler: function(tagManager, tag, isEmpty?) {
+                return true;
             }
             , createElementHandler: function(tagManager, tagElement, isImport?) {
                 tagManager.$element.before(tagElement);
@@ -76,7 +76,7 @@ class TagManager {
 
     /**
      * If a delimiting key is pressed, add the current value
-     * If backspace then delete latest tag
+     * If backspace then remove latest tag
      */
     keypress(e) {
         if ($.inArray(e.which, this.options.backspaceChars) != -1) {
@@ -108,34 +108,35 @@ class TagManager {
     empty() {
         var manager = this;
         $(this.tagIds).each(function(index, value) {
-            manager.delete(value, true);
+            manager.remove(value, true);
         });
     }
 
     /**
-     * Delete the last tag
+     * Remove the last tag
      */
     pop() {
         if (this.tagIds.length > 0) {
-            this.delete(this.tagIds[this.tagIds.length - 1]);
+            this.remove(this.tagIds[this.tagIds.length - 1]);
         }
     }
 
     /**
-     * Delete a tag
+     * Remove/delete a tag
      */
-    delete(tagId: string, isEmpty?: bool) {
+    remove(tagId: string, isEmpty?: bool) {
         var tagString = $('#' + tagId).attr('tag');
 
-        if (this.options.deleteHandler)
-            this.options.deleteHandler(this, tagString, isEmpty);
+        if (this.options.removeHandler)
+            if (!this.options.removeHandler(this, tagString, isEmpty))
+                return;
 
-        if (this.options.strategy = 'ajax'
-            && this.options.ajaxDelete
+        if (this.options.strategy == 'ajax'
+            && this.options.ajaxRemove
             && !isEmpty) {
 
             $.ajax({
-                url: this.options.ajaxDelete
+                url: this.options.ajaxRemove
                 , type: 'post'
                 , data: {
                     tag: tagString
@@ -152,9 +153,9 @@ class TagManager {
     }
 
     /**
-     * Import prefilled tags without triggering ajaxCreate
+     * Create prefilled tags without triggering ajaxCreate
      */
-    import(tags) {
+    populate(tags) {
         var manager = this;
         $.each(tags, function(key, val) {
             manager.create(val, true);
@@ -180,7 +181,7 @@ class TagManager {
             return;
         }
 
-        if (this.options.strategy = 'ajax'
+        if (this.options.strategy == 'ajax'
             && this.options.ajaxCreate
             && !isImport) {
 
@@ -264,7 +265,7 @@ class Tag {
         var manager = this.manager;
 
         $(tagRemover).click(function(e) {
-            manager.delete(id);
+            manager.remove(id);
             return false;
         });
 
